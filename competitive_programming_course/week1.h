@@ -112,3 +112,29 @@ void chipPlacing(vector<char> &chips, int n, int m, int last, int placed){
         chips[i] = '.';
     }
 }
+
+// Задача комиваежера
+//vector<vector<int>> dsts -> все пути. Граф полносвязный
+// int cities = dsts.size()
+//vector<int> path -> пути. НУ: path = {0}
+//vector<int> respath -> лучший путь
+//vector<bool> used -> посещенные города. НУ: used = {true, false, ...} размером в cities
+void salesmanProblem(int curLen, int &res){
+    if(curLen >= res)
+        return;
+    if(path.size() == cities){
+        res = curLen + dsts[path.back()][0];// пути в первый город
+        respath = path;
+        return;
+    }
+    for(int i = 0; i < cities; ++i){
+        if(used[i])
+            continue;
+        auto last = path.back();
+        path.push_back(i);
+        used[i] = true;
+        salesmanProblem(curLen + dsts[last][i], res);
+        path.pop_back();
+        used[i] = false;
+    }
+}
