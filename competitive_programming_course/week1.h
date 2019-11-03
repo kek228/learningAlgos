@@ -1,6 +1,10 @@
 #pragma once
 // Неделя была посвященна всяким рекурсивным обходам, бэктрекингу
+
+
 // подмножества длинной size
+// идея проста, мы каждый раз либо добовляем число к подмножеству, либо пропускаем
+// i тут это счетчик ПРОСМОТРЕННЫХ, не обязательно добавленных элементов
 void genSubsets(vector<int> &subset, int n, int i, int subsetsize){
     if(i == n){
         if(subset.size() == subsetsize){
@@ -17,6 +21,8 @@ void genSubsets(vector<int> &subset, int n, int i, int subsetsize){
 }
 
 // все перестановки числе от [from, to) размера permutsize
+// идея сходна с подмножествами, но теперь нужно всегда пытаться добавить
+// и отмечать добавленные
 void genPermuts(vector<int> &permut, vector<bool> &used, int from, int to, int permutsize){
     if(permut.size() == permutsize){
         for(auto el: permut)
@@ -34,6 +40,7 @@ void genPermuts(vector<int> &permut, vector<bool> &used, int from, int to, int p
         used[j] = false;
     }
 }
+
 // валидные скобочные последовательности
 // отличный пример бэктрэкинга
 void validParentheses(vector<char> &parentheses, int n,  int open, int close){
