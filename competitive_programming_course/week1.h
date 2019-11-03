@@ -20,7 +20,21 @@ void genSubsets(vector<int> &subset, int n, int i, int subsetsize){
     genSubsets(subset, n, i + 1, n);
 }
 
-// все перестановки числе от [from, to) размера permutsize
+// Все перестановки с повторениями
+void genAllPermutsWithDoubles(vector<int> &permut, int from, int to, int permutsize, int &c){
+    if(permut.size() == permutsize){
+        for(auto el: permut)
+            cout<<el<<' ';
+        cout<<endl;
+        return;
+    }
+    for(int j = from; j < to; ++j){
+        permut.push_back(j);
+        genAllPermutsWithDoubles(permut, from, to, permutsize, c);
+        permut.pop_back();
+    }
+}
+// все перестановки чисел от [from, to) размера permutsize БЕЗ ПОВТОРОВ
 // идея сходна с подмножествами, но теперь нужно всегда пытаться добавить
 // и отмечать добавленные
 void genPermuts(vector<int> &permut, vector<bool> &used, int from, int to, int permutsize){
@@ -63,12 +77,10 @@ void validParentheses(vector<char> &parentheses, int n,  int open, int close){
 }
 
 // Все разбиения числа на слагаемые
-// Важно что все комбинации не убывающие 
+// Важно что все комбинации не убывающие
 void allTerms(vector<int> &terms, int n, int sum){
     if(sum == n){
         for(auto t: terms){
-            if(t == 0)
-                continue;
             cout<<t<<' ';
         }
         cout<<endl;
@@ -81,5 +93,22 @@ void allTerms(vector<int> &terms, int n, int sum){
         terms.push_back(t);
         allTerms(terms, n, sum + t);
         terms.pop_back();
+    }
+}
+
+// расстановка фишек
+// вызов: chipPlacing(chips, n, m, -2, 0);
+void chipPlacing(vector<char> &chips, int n, int m, int last, int placed){
+    if(placed == m){
+        for(auto c: chips){
+            cout<<c;
+        }
+        cout<<endl;
+        return;
+    }
+    for(int i = last + 2; i < n; ++i){
+        chips[i] = '*';
+        chipPlacing(chips, n, m, i, placed + 1);
+        chips[i] = '.';
     }
 }
