@@ -24,7 +24,7 @@ vector<int> split(const string& str, char delim = ' '){
 
 
 int main(){
-    vector<char> parentheses;
-    validParentheses(parentheses, 3, 0, 0);
+    vector<int> terms;
+    allTerms(terms, 5, 0);
     return 0;
 }

@@ -61,3 +61,25 @@ void validParentheses(vector<char> &parentheses, int n,  int open, int close){
         parentheses.pop_back();
     }
 }
+
+// Все разбиения числа на слагаемые
+// Важно что все комбинации не убывающие 
+void allTerms(vector<int> &terms, int n, int sum){
+    if(sum == n){
+        for(auto t: terms){
+            if(t == 0)
+                continue;
+            cout<<t<<' ';
+        }
+        cout<<endl;
+        return;
+    }
+    int t = 1;
+    if(!terms.empty())
+        t = terms.back();
+    for(; t <= n - sum; ++t){
+        terms.push_back(t);
+        allTerms(terms, n, sum + t);
+        terms.pop_back();
+    }
+}
