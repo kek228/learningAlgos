@@ -30,40 +30,7 @@ namespace alg_utils{
         return res;
     }
 
-    // подмножества длинной size
-    void genSubsets(vector<int> &subset, int n, int i, int subsetsize){
-        if(i == n){
-            if(subset.size() == subsetsize){
-                for(auto el: subset)
-                    cout<<el<<' ';
-                cout<<endl;
-            }
-            return;
-        }
-        subset.push_back(i);
-        genSubsets(subset, n, i + 1, n);
-        subset.pop_back();
-        genSubsets(subset, n, i + 1, n);
-    }
 
-// все перестановки числе от [from, to) размера permutsize
-    void genPermuts(vector<int> &permut, vector<bool> &used, int from, int to, int permutsize){
-        if(permut.size() == permutsize){
-            for(auto el: permut)
-                cout<<el<<' ';
-            cout<<endl;
-            return;
-        }
-        for(int j = from; j < to; ++j){
-            if(used[j])
-                continue;
-            permut.push_back(j);
-            used[j] = true;
-            genPermuts(permut, used, from, to, permutsize);
-            permut.pop_back();
-            used[j] = false;
-        }
-    }
 
 
     //  ДИНАМИКА
