@@ -14,7 +14,7 @@
 
 using namespace std;
 
-vector<int> split(const string& str, char delim = ' '){
+vector<int> split(const string &str, char delim = ' ') {
     vector<int> res;
     std::stringstream ss(str);
     std::string token;
@@ -24,76 +24,19 @@ vector<int> split(const string& str, char delim = ' '){
     return res;
 }
 
-int counter = 0;
-bool ArePair(char opening,char closing)
-{
-    if(opening == '(' && closing == ')') return true;
-    else if(opening == '{' && closing == '}') return true;
-    else if(opening == '[' && closing == ']') return true;
-    return false;
-}
-bool AreParanthesesBalanced(vector<char> &exp)
-{
-    stack<char>  S;
-    for(int i =0;i<exp.size();i++)
-    {
-        if(exp[i] == '(' || exp[i] == '{' || exp[i] == '[')
-            S.push(exp[i]);
-        else if(exp[i] == ')' || exp[i] == '}' || exp[i] == ']')
-        {
-            if(S.empty() || !ArePair(S.top(),exp[i]))
-                return false;
-            else
-                S.pop();
-        }
-    }
-    return S.empty() ? true:false;
-}
 
-void validParentheses(vector<char> &parentheses, int n, int b1, int b2){
-    if(parentheses.size() == 2*n){
-        //if(counter == 8644)
-        //{
-        if(AreParanthesesBalanced(parentheses)){
-            ++counter;
-            if(counter == 8233){
-                for(auto el: parentheses)
-                    cout<<el<<' ';
-                cout<<endl;
-            }
-        }
-        //}
-        return;
-    }
-    parentheses.push_back('(');
-    validParentheses(parentheses, n, b1 + 1, b2);
-    parentheses.pop_back();
-    if(b1 != 0){
-        parentheses.push_back(')');
-        validParentheses(parentheses, n, b1 - 1, b2);
-        parentheses.pop_back();
-    }
-    //
-    parentheses.push_back('[');
-    validParentheses(parentheses, n, b1, b2 + 1);
-    parentheses.pop_back();
-    if(b2 != 0){
-        parentheses.push_back(']');
-        validParentheses(parentheses, n, b1, b2 - 1);
-        parentheses.pop_back();
-    }
+int main() {
+    int n;
+    cin >> n;
+    cin.ignore();
+    string input;
 
-
-}
-
-int main(){
-    vector<char> parentheses;
-    validParentheses(parentheses, 7, 0, 0);
+    vector<pair<int, int>> tasks;
+    while (getline(cin, input) && n > 0) {
+        auto parced = split(input);
+        tasks.push_back({parced[0], parced[1]});
+        --n;
+    }
+    cout << scheduleTask(tasks);
     return 0;
 }
-// 4096
-// ( ( ) ( ( ) ( ) ) ) ( ) ( ) ( ) ( ( ) )
-// 172 0 3 8 7 ...
-// 1 5
-// ( [ ] [ ] )
-// ( ( [ ] ( ) ) ( [ ] ) ) ( ) 
