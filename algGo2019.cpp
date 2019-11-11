@@ -24,19 +24,53 @@ vector<int> split(const string &str, char delim = ' ') {
     return res;
 }
 
+struct Task {
+    Task(int deadline, int price) : _deadline(deadline), _price(price) {}
+
+    int _deadline;
+    int _price;
+};
+
+size_t scheduleTask(vector<Task> &tasks) {
+    vector<bool> usedDates(tasks.size(), false);
+    size_t res = 0;
+    sort(tasks.begin(), tasks.end(), [](Task &l, Task &r) { return l._price > r._price; });
+    for (auto &t: tasks) {
+        int index = t._deadline - 1;
+        while (index >= 0 && usedDates[index]) {
+            --index;
+        }
+        if (index >= 0) {
+            usedDates[index] = true;
+            res += t._price;
+        }
+    }
+    return res;
+}
+
 
 int main() {
-    int n;
-    cin >> n;
-    cin.ignore();
+    vector<Task> tasks;
+    std::ifstream infile("/Users/nikita/CLionProjects/ALGOS/test.txt");
     string input;
-
-    vector<pair<int, int>> tasks;
-    while (getline(cin, input) && n > 0) {
-        auto parced = split(input);
-        tasks.push_back({parced[0], parced[1]});
+    getline(infile, input);
+    int n = stoi(input);
+    while (n > 0) {
+        getline(infile, input);
+        vector<int> oneApp = split(input);
+        tasks.emplace_back(oneApp[0], oneApp[1]);
         --n;
     }
     cout << scheduleTask(tasks);
     return 0;
 }
+
+// Ответы
+// 4
+// n^2
+//
+//
+// 4
+// 372
+// 4
+// 1021
