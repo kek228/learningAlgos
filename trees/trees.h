@@ -15,6 +15,28 @@ int treeDiam(Node *node, int &res) {
     return max(ldst, rdst) + 1;
 }
 
+// kй сверху наследник
+Node *res;
+
+void findKAns(Node *node, int val, int &k, bool &found) {
+    if (!node)
+        return;
+    if (node->data == val) {
+        found = true;
+        return;
+    }
+    if (!found)
+        findKAns(node->l, val, k, found);
+    if (!found)
+        findKAns(node->r, val, k, found);
+    if (found) {
+        --k;
+        if (k == 0)
+            res = node;
+    }
+}
+
+
 //auto *root = new Node{1, nullptr, nullptr};
 //root->l = new Node{3, nullptr, nullptr};
 //root->r = new Node{2, nullptr, nullptr};
