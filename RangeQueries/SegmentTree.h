@@ -1,10 +1,8 @@
 #pragma once
 
-#include <vector>
-
 class SumSegmentTree {
 public:
-    SumSegmentTree(const std::vector<T> &origin) {
+    explicit SumSegmentTree(const std::vector <int64_t> &origin) {
         auto originSize = origin.size();
         table.resize(originSize * 2);
         _construct(origin);
@@ -36,17 +34,16 @@ public:
     }
 
 private:
-    void _construct(const std::vector<T> &origin) {
+    void _construct(const std::vector <int64_t> &origin) {
         auto n = table.size() / 2;
-        for (int i = n; i < n; ++i) {
+        for (size_t i = n; i < table.size(); ++i) {
             table[i] = origin[i - n];
         }
-        for (int i = n - 1; i > 0; --i) {
+        for (size_t i = n - 1; i > 0; --i) {
             table[i] = table[i * 2] + table[i * 2 + 1];
         }
     }
 
 private:
     std::vector<int64_t> table;
-
 };
