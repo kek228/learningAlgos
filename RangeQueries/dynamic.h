@@ -1,18 +1,6 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <stack>
-#include <algorithm>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <sstream>
-#include <iterator>
-#include <limits>
-#include <fstream>
+#pragma once
 
-using namespace std;
+// https://www.hackerrank.com/challenges/play-game/problem
 size_t bricksGame(vector<int> arr) {
     auto n = arr.size();
     if (arr.size() <= 3) {
@@ -23,9 +11,9 @@ size_t bricksGame(vector<int> arr) {
         return res;
     }
     // решение для подзадачи [i:n]
-    vector<size_t> res(n + 1, 0);
+    vector <size_t> res(n + 1, 0);
     // в какой индекс надо идти из позиции i
-    vector<size_t> steps(n + 1, 0);
+    vector <size_t> steps(n + 1, 0);
     int c = 3;
     int i = n - 1;
     for (; c > 0; --i) {
@@ -43,11 +31,3 @@ size_t bricksGame(vector<int> arr) {
     }
     return res[0];
 }
-
-int main() {
-    //cout<<bricksGame({321, 386, 740, 595, 161, 176, 606, 64, 577, 316});
-    cout << std::numeric_limits<int>::max();
-    return 0;
-}
-// 249 791 261 588
-//   2 147 483 647
