@@ -33,10 +33,11 @@ public:
     };
 
 
-    explicit SuffixArray(const string &str) : _suffixArray(str.size()) {
+    explicit SuffixArray(const string &str) : _original(str), _suffixArray(str.size() + 1) {
         vector<int> classArr;
         for (auto c: str)
             classArr.push_back(c);
+        classArr.push_back(0);
         //
         int n = classArr.size();
         vector<Suffix> suffixes(n);
@@ -66,12 +67,19 @@ public:
         }
     }
 
+    string maxStr() {
+        int maxBegin = _suffixArray.back();
+        return _original.substr(maxBegin);
+    }
+
 private:
+    const string _original;
     vector<int> _suffixArray;
 };
 
 int main() {
-    string str = "banana";
+    string str = "abab";
     SuffixArray suffixArray(str);
+    cout << suffixArray.maxStr().data();
     return 0;
 }
