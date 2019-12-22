@@ -1,18 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <stack>
-#include <algorithm>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <sstream>
-#include <iterator>
-#include <limits>
-#include <fstream>
-
-using namespace std;
+#pragma once
 
 class SuffixArray {
 public:
@@ -39,7 +25,7 @@ public:
             classArr.push_back(c);
         //
         int n = classArr.size();
-        vector<Suffix> suffixes(n);
+        vector <Suffix> suffixes(n);
         for (int i = 1; i < n; i *= 2) {
             for (int strPos = 0; strPos < classArr.size(); ++strPos)
                 // classArr[strPos] ранг строки с strPos, с предидущего шага
@@ -69,9 +55,3 @@ public:
 private:
     vector<int> _suffixArray;
 };
-
-int main() {
-    string str = "banana";
-    SuffixArray suffixArray(str);
-    return 0;
-}
