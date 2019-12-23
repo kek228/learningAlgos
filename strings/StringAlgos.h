@@ -1,5 +1,4 @@
 #pragma once
-
 class SuffixArray {
 public:
     // очередной суффикс
@@ -62,4 +61,3 @@ private:
     const string _original;
     vector<int> _suffixArray;
 };
-

@@ -11,6 +11,7 @@
 #include <iterator>
 #include <limits>
 #include <fstream>
+#include <set>
 
 using namespace std;
 
@@ -78,8 +79,8 @@ private:
 };
 
 int main() {
-    string str = "abab";
+    string str = "leetcode";
     SuffixArray suffixArray(str);
-    cout << suffixArray.maxStr().data();
+    //cout << suffixArray.maxStr().data();
     return 0;
 }
