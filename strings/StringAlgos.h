@@ -1,4 +1,5 @@
 #pragma once
+
 class SuffixArray {
 public:
     // очередной суффикс
