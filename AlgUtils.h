@@ -23,11 +23,18 @@ namespace alg_utils{
             digits[c - '0'] = true;
         }
         vector<int> res;
-        for(int i = 1; i < 10; ++i){
-            if(digits[i])
+        for (int i = 1; i < 10; ++i) {
+            if (digits[i])
                 res.push_back(i);
         }
         return res;
     }
 
+}
+
+vector<vector<int>> constructTable(int rows, int cols) {
+    vector<vector<int>> table(rows);
+    for (auto &row: table)
+        row = vector<int>(cols, 0);
+    return table;
 }
