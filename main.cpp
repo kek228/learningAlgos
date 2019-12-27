@@ -22,7 +22,7 @@ vector<vector<int>> constructTable(int rows, int cols) {
     return table;
 }
 
-int longestPalindromeSubseq(string s) {
+int playWithWords(string s) {
     int size = s.size();
     if (size == 0)
         return 0;
@@ -46,7 +46,17 @@ int longestPalindromeSubseq(string s) {
                 resTable[row][col] = max(resTable[row - 1][col - 1], resTable[row - 1][col]);
         }
     }
-    return resTable[size - 1][size - 1];
+    //
+    int res = 1;
+    for (int i = 0; i < size - 1; ++i) {
+        int firstMul = resTable[i][i];
+        vector<int> &secondPart = resTable[size - i - 2];
+        auto secondMul = secondPart.back();
+        auto curRes = firstMul * secondMul;
+        if (curRes > res)
+            res = curRes;
+    }
+    return res;
 }
 
 
@@ -56,7 +66,7 @@ int main() {
     // cout<<longestPalindromeSubseq("dkecampaed");
     // cout<<longestPalindromeSubseq("bbbab");
     //cout<<longestPalindromeSubseq("aabaa");
-    cout << longestPalindromeSubseq("abcdabcdabcdabcd");
-
+    // cout << playWithWords("acbafabcba");
+    cout << playWithWords("eeegeeksforskeeggeeks");
     return 0;
 }
