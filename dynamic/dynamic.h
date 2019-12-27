@@ -146,7 +146,6 @@ int processDiag(int row, int col, int l, int k, vector <vector<int>> &table) {
     return res;
 }
 
-// https://leetcode.com/problems/longest-palindromic-subsequence/
 int substringDiff(int k, string s1, string s2) {
     int rows = s1.size();
     int cols = s2.size();
@@ -188,6 +187,7 @@ int substringDiff(int k, string s1, string s2) {
     return res;
 }
 
+// https://leetcode.com/problems/longest-palindromic-subsequence/
 int longestPalindromeSubseq(string s) {
     int size = s.size();
     if (size == 0)
