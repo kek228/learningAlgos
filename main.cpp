@@ -22,51 +22,38 @@ vector<vector<int>> constructTable(int rows, int cols) {
     return table;
 }
 
-int playWithWords(string s) {
-    int size = s.size();
-    if (size == 0)
-        return 0;
-    if (size == 1)
-        return 1;
-    auto resTable = constructTable(size, size);
-    resTable[0][0] = 1;
-    for (int col = 1; col < size; ++col) {
-        resTable[0][col] = 1;
-        if (s[col] == s[col - 1])
-            resTable[1][col] = 2;
-        else
-            resTable[1][col] = 1;
-    }
-    //
-    for (int row = 2; row < size; ++row) {
-        for (int col = row; col < size; ++col) {
-            if (s[col] == s[col - row])
-                resTable[row][col] = resTable[row - 2][col - 1] + 2;
-            else
-                resTable[row][col] = max(resTable[row - 1][col - 1], resTable[row - 1][col]);
-        }
-    }
-    //
-    int res = 1;
-    for (int i = 0; i < size - 1; ++i) {
-        int firstMul = resTable[i][i];
-        vector<int> &secondPart = resTable[size - i - 2];
-        auto secondMul = secondPart.back();
-        auto curRes = firstMul * secondMul;
-        if (curRes > res)
-            res = curRes;
+vector<int> split(char delim = ' ') {
+    std::ifstream t("/Users/nikita/CLionProjects/ALGOS/test.txt");
+    std::string str((std::istreambuf_iterator<char>(t)),
+                    std::istreambuf_iterator<char>());
+
+    vector<int> res;
+    std::stringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, delim)) {
+        res.push_back(stoi(token));
     }
     return res;
 }
 
+int cost(vector<int> b) {
+    int size = b.size();
+    auto table = constructTable(2, size);
+    for (int i = 1; i < size; ++i) {
+        // решение заканчивается на 1
+        table[0][i] = max(table[0][i - 1] + 0, table[1][i - 1] + abs(b[i - 1] - 1));
+        // решение заканчивается на макс возможное
+        table[1][i] = max(table[0][i - 1] + abs(b[i] - 1), table[1][i - 1] + abs(b[i] - b[i - 1]));
+    }
+    return max(table[0][size - 1], table[1][size - 1]);
+}
+
 
 int main() {
-    //cout<<longestPalindromeSubseq("kecampaep");
-    // cout<<longestPalindromeSubseq("abbkeb");
-    // cout<<longestPalindromeSubseq("dkecampaed");
-    // cout<<longestPalindromeSubseq("bbbab");
-    //cout<<longestPalindromeSubseq("aabaa");
-    // cout << playWithWords("acbafabcba");
-    cout << playWithWords("eeegeeksforskeeggeeks");
+    // cout << cost({100, 10, 5});
+    // cout << cost({1, 2, 3});
+    // 10 62 30 19 71 49 13 40 16 44 28 -> 426
+    auto b = split();
+    cout << cost({100, 2, 100, 2, 100});
     return 0;
 }

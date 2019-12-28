@@ -252,3 +252,16 @@ int playWithWords(string s) {
     }
     return res;
 }
+
+// https://www.hackerrank.com/challenges/sherlock-and-cost
+int cost(vector<int> b) {
+    int size = b.size();
+    auto table = constructTable(2, size);
+    for (int i = 1; i < size; ++i) {
+        // решение заканчивается на 1
+        table[0][i] = max(table[0][i - 1] + 0, table[1][i - 1] + abs(b[i - 1] - 1));
+        // решение заканчивается на макс возможное
+        table[1][i] = max(table[0][i - 1] + abs(b[i] - 1), table[1][i - 1] + abs(b[i] - b[i - 1]));
+    }
+    return max(table[0][size - 1], table[1][size - 1]);
+}
