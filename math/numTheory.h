@@ -1,5 +1,17 @@
 #pragma once
 
+// проверка на простоту
+bool prime(int n) {
+    if (n == 0)
+        return false;
+    if (n == 1)
+        return true;
+    for (int x = 2; x * x <= n; ++x) {
+        if (n % x == 0) return false;
+    }
+    return true;
+}
+
 // все делители числа n
 vector<int> factors(int n) {
     vector<int> f;
