@@ -16,7 +16,6 @@
 #include <optional>
 
 using namespace std;
-using Labyrinth = std::vector<std::vector<int> >;
 
 vector<vector<int>> constructTable(int rows, int cols) {
     vector<vector<int>> table(rows);
@@ -25,143 +24,46 @@ vector<vector<int>> constructTable(int rows, int cols) {
     return table;
 }
 
-struct Cell {
-    Cell() = default;
 
-    Cell(const Cell &right) = default;
+int maxProfit(vector<int> &prices) {
+#define BUY 0
+#define SELL 1
+#define BUY_WAIT 2
+#define SELL_WAIT 3
+#define WAIT 4
 
-    Cell(int _row, int _column) : row(_row), column(_column) {}
-
-    bool operator==(const Cell &right) {
-        return row == right.row && column == right.column;
+    if (prices.size() < 2)
+        return 0;
+    int cols = static_cast<int>(prices.size());
+    int rows = 5;
+    auto table = constructTable(rows, cols);
+    for (int row = 0; row < 5; ++row) {
+        table[row][0] = numeric_limits<int>::min();
     }
-
-    int row;
-    int column;
-};
-
-bool operator==(const Cell &left, const Cell &right) {
-    return left.row == right.row && left.column == right.column;
-}
-
-
-std::optional<Cell> top(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
-    auto targetRow = cur.row - 1;
-    if (targetRow < 0)
-        return std::nullopt;
-    if (world[targetRow][cur.column] == 1 && marker[targetRow][cur.column] == 0)
-        return {{targetRow, cur.column}};
-    else
-        return std::nullopt;
-}
-
-std::optional<Cell> right(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
-    auto targetColumn = cur.column + 1;
-    if (targetColumn == world[0].size())
-        return std::nullopt;
-    if (world[cur.row][targetColumn] == 1 && marker[cur.row][targetColumn] == 0)
-        return {{cur.row, targetColumn}};
-    else
-        return std::nullopt;
-}
-
-std::optional<Cell> bottom(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
-    auto targetRow = cur.row + 1;
-    if (targetRow == world.size())
-        return std::nullopt;
-    if (world[targetRow][cur.column] == 1 && marker[targetRow][cur.column] == 0)
-        return {{targetRow, cur.column}};
-    else
-        return std::nullopt;
-}
-
-std::optional<Cell> left(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
-    auto targetColumn = cur.column - 1;
-    if (targetColumn < 0)
-        return std::nullopt;
-    if (world[cur.row][targetColumn] == 1 && marker[cur.row][targetColumn] == 0)
-        return {{cur.row, targetColumn}};
-    else
-        return std::nullopt;
-}
-
-void checkAndSet(Labyrinth &marker, std::queue<Cell> &cellsToVisit, vector<Cell> &component, std::optional<Cell> &cell,
-                 int label) {
-    if (cell) {
-        component.push_back(*cell);
-        cellsToVisit.push(*cell);
-        marker[(*cell).row][(*cell).column] = label;
+    table[BUY][0] = -prices[0];
+    table[WAIT][0] = 0;
+    for (int col = 1; col < cols; ++col) {
+        table[BUY][col] = max(table[SELL_WAIT][col - 1], table[WAIT][col - 1]) - prices[col];
+        //
+        table[SELL][col] = max(table[BUY][col - 1], table[BUY_WAIT][col - 1]) + prices[col];
+        //
+        table[BUY_WAIT][col] = max(table[BUY][col - 1], table[BUY_WAIT][col - 1]);
+        //
+        table[SELL_WAIT][col] = max(table[SELL][col - 1], table[SELL_WAIT][col - 1]);
+        //
+        table[WAIT][0] = 0;
     }
-}
-
-vector<Cell> findComponent(Cell start, vector<vector<int>> &world, vector<vector<int>> &marker, int label) {
-    vector<Cell> res;
-    queue<Cell> cellsToVisit;
-    cellsToVisit.push(start);
-    res.push_back(start);
-    marker[start.row][start.column] = label;
-    while (!cellsToVisit.empty()) {
-        auto curCell = cellsToVisit.front();
-        cellsToVisit.pop();
-        auto topCell = top(world, marker, curCell);
-        checkAndSet(marker, cellsToVisit, res, topCell, label);
-        //
-        auto rightCell = right(world, marker, curCell);
-        checkAndSet(marker, cellsToVisit, res, rightCell, label);
-        //
-        auto bottomCell = bottom(world, marker, curCell);
-        checkAndSet(marker, cellsToVisit, res, bottomCell, label);
-        //
-        auto leftCell = left(world, marker, curCell);
-        checkAndSet(marker, cellsToVisit, res, leftCell, label);
+    int res = table[0][cols - 1];
+    for (int row = 0; row < 5; ++row) {
+        if (table[row][cols - 1] > res)
+            res = table[row][cols - 1];
     }
     return res;
 }
-
-int shortestBridgeRoutine(const vector<Cell> &v1, const vector<Cell> &v2) {
-    int res = numeric_limits<int>::max();
-    for (const auto &cell1: v1) {
-        for (const auto &cell2: v2) {
-            int dst = abs(cell1.row - cell2.row) + abs(cell1.column - cell2.column) - 1;
-            if (dst < res)
-                res = dst;
-        }
-    }
-    return res;
-}
-
-int shortestBridge(vector<vector<int>> &A) {
-    int rows = A.size();
-    int cols = A[0].size();
-    vector<vector<int>> marker = constructTable(rows, cols);
-    vector<vector<Cell>> components;
-    int label = 1;
-    for (int row = 0; row < rows; ++row) {
-        for (int col = 0; col < cols; ++col) {
-            if (A[row][col] == 1 && marker[row][col] == 0) {
-                auto component = findComponent({row, col}, A, marker, label);
-                ++label;
-                components.push_back(component);
-            }
-        }
-    }
-    return shortestBridgeRoutine(components[0], components[1]);
-}
-
 
 int main() {
-//    vector<vector<int>> A = {
-//            {1, 1, 1, 1, 1},
-//            {1, 0, 0, 0, 1},
-//            {1, 0, 1, 0, 1},
-//            {1, 0, 0, 0, 1},
-//            {1, 1, 1, 1, 1}
-//    };
-    vector<vector<int>> A = {
-            {0, 1},
-            {1, 0}
-    };
-
-    cout << shortestBridge(A);
+    // vector<int> prices = {1, 2, 3, 0, 2};
+    vector<int> prices = {1, 2, 4};
+    cout << maxProfit(prices);
     return 0;
 }
