@@ -1,25 +1,10 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <unordered_map>
-#include <unordered_set>
-#include <stack>
-#include <algorithm>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <sstream>
-#include <iterator>
-#include <limits>
-#include <fstream>
-#include <set>
-#include <optional>
+#pragma once
 
 using namespace std;
-using Labyrinth = std::vector<std::vector<int> >;
+using Labyrinth = std::vector <std::vector<int>>;
 
-vector<vector<int>> constructTable(int rows, int cols) {
-    vector<vector<int>> table(rows);
+vector <vector<int>> constructTable(int rows, int cols) {
+    vector <vector<int>> table(rows);
     for (auto &row: table)
         row = vector<int>(cols, 0);
     return table;
@@ -45,7 +30,7 @@ bool operator==(const Cell &left, const Cell &right) {
 }
 
 
-std::optional<Cell> top(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
+std::optional <Cell> top(const Labyrinth &world, vector <vector<int>> &marker, const Cell &cur) {
     auto targetRow = cur.row - 1;
     if (targetRow < 0)
         return std::nullopt;
@@ -55,7 +40,7 @@ std::optional<Cell> top(const Labyrinth &world, vector<vector<int>> &marker, con
         return std::nullopt;
 }
 
-std::optional<Cell> right(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
+std::optional <Cell> right(const Labyrinth &world, vector <vector<int>> &marker, const Cell &cur) {
     auto targetColumn = cur.column + 1;
     if (targetColumn == world[0].size())
         return std::nullopt;
@@ -65,7 +50,7 @@ std::optional<Cell> right(const Labyrinth &world, vector<vector<int>> &marker, c
         return std::nullopt;
 }
 
-std::optional<Cell> bottom(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
+std::optional <Cell> bottom(const Labyrinth &world, vector <vector<int>> &marker, const Cell &cur) {
     auto targetRow = cur.row + 1;
     if (targetRow == world.size())
         return std::nullopt;
@@ -75,7 +60,7 @@ std::optional<Cell> bottom(const Labyrinth &world, vector<vector<int>> &marker, 
         return std::nullopt;
 }
 
-std::optional<Cell> left(const Labyrinth &world, vector<vector<int>> &marker, const Cell &cur) {
+std::optional <Cell> left(const Labyrinth &world, vector <vector<int>> &marker, const Cell &cur) {
     auto targetColumn = cur.column - 1;
     if (targetColumn < 0)
         return std::nullopt;
@@ -85,8 +70,9 @@ std::optional<Cell> left(const Labyrinth &world, vector<vector<int>> &marker, co
         return std::nullopt;
 }
 
-void checkAndSet(Labyrinth &marker, std::queue<Cell> &cellsToVisit, vector<Cell> &component, std::optional<Cell> &cell,
-                 int label) {
+void
+checkAndSet(Labyrinth &marker, std::queue <Cell> &cellsToVisit, vector <Cell> &component, std::optional <Cell> &cell,
+            int label) {
     if (cell) {
         component.push_back(*cell);
         cellsToVisit.push(*cell);
@@ -94,9 +80,9 @@ void checkAndSet(Labyrinth &marker, std::queue<Cell> &cellsToVisit, vector<Cell>
     }
 }
 
-vector<Cell> findComponent(Cell start, vector<vector<int>> &world, vector<vector<int>> &marker, int label) {
-    vector<Cell> res;
-    queue<Cell> cellsToVisit;
+vector <Cell> findComponent(Cell start, vector <vector<int>> &world, vector <vector<int>> &marker, int label) {
+    vector <Cell> res;
+    queue <Cell> cellsToVisit;
     cellsToVisit.push(start);
     res.push_back(start);
     marker[start.row][start.column] = label;
@@ -118,7 +104,7 @@ vector<Cell> findComponent(Cell start, vector<vector<int>> &world, vector<vector
     return res;
 }
 
-int shortestBridgeRoutine(const vector<Cell> &v1, const vector<Cell> &v2) {
+int shortestBridgeRoutine(const vector <Cell> &v1, const vector <Cell> &v2) {
     int res = numeric_limits<int>::max();
     for (const auto &cell1: v1) {
         for (const auto &cell2: v2) {
@@ -130,11 +116,12 @@ int shortestBridgeRoutine(const vector<Cell> &v1, const vector<Cell> &v2) {
     return res;
 }
 
-int shortestBridge(vector<vector<int>> &A) {
+// https://leetcode.com/problems/shortest-bridge
+int shortestBridge(vector <vector<int>> &A) {
     int rows = A.size();
     int cols = A[0].size();
-    vector<vector<int>> marker = constructTable(rows, cols);
-    vector<vector<Cell>> components;
+    vector <vector<int>> marker = constructTable(rows, cols);
+    vector <vector<Cell>> components;
     int label = 1;
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < cols; ++col) {
@@ -146,22 +133,4 @@ int shortestBridge(vector<vector<int>> &A) {
         }
     }
     return shortestBridgeRoutine(components[0], components[1]);
-}
-
-
-int main() {
-//    vector<vector<int>> A = {
-//            {1, 1, 1, 1, 1},
-//            {1, 0, 0, 0, 1},
-//            {1, 0, 1, 0, 1},
-//            {1, 0, 0, 0, 1},
-//            {1, 1, 1, 1, 1}
-//    };
-    vector<vector<int>> A = {
-            {0, 1},
-            {1, 0}
-    };
-
-    cout << shortestBridge(A);
-    return 0;
 }
