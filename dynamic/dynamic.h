@@ -292,7 +292,7 @@ int maxProfit(vector<int> &prices) {
         //
         table[SELL_WAIT][col] = max(table[SELL][col - 1], table[SELL_WAIT][col - 1]);
         //
-        table[WAIT][0] = 0;
+        table[WAIT][col] = 0;
     }
     int res = table[0][cols - 1];
     for (int row = 0; row < 5; ++row) {
