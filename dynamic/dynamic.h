@@ -41,6 +41,35 @@ int lengthOfLISBinSearch(vector<int> &nums) {
     return subsequencies.size();
 }
 
+// TODO переделать на бинарный поиск
+// https://leetcode.com/problems/russian-doll-envelopes/
+int maxEnvelopes(vector <vector<int>> &envelopes) {
+    int size = envelopes.size();
+    if (size == 0)
+        return 0;
+    //
+    sort(envelopes.begin(), envelopes.end(), [](vector<int> &f, vector<int> &s) {
+        if (f[0] != s[0])
+            return f[0] < s[0];
+        return f[1] < s[1];
+    });
+    vector<int> res(size, 0);
+    res[0] = 1;
+    int result = 1;
+    for (int i = 1; i < size; ++i) {
+        int resi = 1;
+        for (int j = 0; j < i; ++j) {
+            if (envelopes[i][0] > envelopes[j][0] && envelopes[i][1] > envelopes[j][1]) {
+                resi = max(resi, res[j] + 1);
+                if (resi > result)
+                    result = resi;
+            }
+        }
+        res[i] = resi;
+    }
+    return result;
+}
+
 // https://www.hackerrank.com/challenges/play-game/problem
 size_t bricksGame(vector<int> arr) {
     auto n = arr.size();
