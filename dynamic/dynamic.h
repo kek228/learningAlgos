@@ -1,6 +1,26 @@
 #pragma once
 
-//
+// https://leetcode.com/problems/longest-increasing-subsequence/
+int lengthOfLIS(vector<int> &nums) {
+    int size = nums.size();
+    if (size == 0)
+        return 0;
+    vector<int> res(size, 0);
+    res[0] = 1;
+    int result = 1;
+    for (int i = 1; i < size; ++i) {
+        int resi = 1;
+        for (int j = 0; j < i; ++j) {
+            if (nums[i] > nums[j]) {
+                resi = max(resi, res[j] + 1);
+                if (resi > result)
+                    result = resi;
+            }
+        }
+        res[i] = resi;
+    }
+    return result;
+}
 
 // https://www.hackerrank.com/challenges/play-game/problem
 size_t bricksGame(vector<int> arr) {
