@@ -41,6 +41,29 @@ int lengthOfLISBinSearch(vector<int> &nums) {
     return subsequencies.size();
 }
 
+// https://leetcode.com/problems/longest-common-subsequence/
+int longestCommonSubsequence(string text1, string text2) {
+    int rows = text1.size() + 1;
+    int cols = text2.size() + 1;
+    if (rows == 1 || cols == 1)
+        return 0;
+    auto resTable = constructTable(rows, cols);
+    for (int col = 0; col < cols; ++col)
+        resTable[0][col] = 0;
+    for (int row = 0; row < rows; ++row)
+        resTable[row][0] = 0;
+
+    for (int row = 1; row < rows; ++row) {
+        for (int col = 1; col < cols; ++col) {
+            if (text1[row - 1] == text2[col - 1])
+                resTable[row][col] = resTable[row - 1][col - 1] + 1;
+            else
+                resTable[row][col] = max(resTable[row - 1][col], resTable[row][col - 1]);
+        }
+    }
+    return resTable[rows - 1][cols - 1];
+}
+
 // TODO переделать на бинарный поиск
 // https://leetcode.com/problems/russian-doll-envelopes/
 int maxEnvelopes(vector <vector<int>> &envelopes) {
