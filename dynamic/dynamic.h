@@ -1,5 +1,7 @@
 #pragma once
 
+//
+
 // https://www.hackerrank.com/challenges/play-game/problem
 size_t bricksGame(vector<int> arr) {
     auto n = arr.size();
