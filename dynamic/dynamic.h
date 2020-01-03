@@ -22,6 +22,25 @@ int lengthOfLIS(vector<int> &nums) {
     return result;
 }
 
+// LIS за nlogn очень крутое использование бин поиска
+int lengthOfLISBinSearch(vector<int> &nums) {
+    if (nums.size() == 0)
+        return 0;
+    // subsequencies[i] на что окончанчивается послед длинной i
+    vector<int> subsequencies;
+    subsequencies.push_back(nums[0]);
+    for (int i = 1; i < nums.size(); ++i) {
+        auto firstBigger = lower_bound(subsequencies.begin(), subsequencies.end(), nums[i]);
+        if (firstBigger == subsequencies.begin())
+            subsequencies[0] = nums[i];
+        else if (firstBigger == subsequencies.end())
+            subsequencies.push_back(nums[i]);
+        else
+            *firstBigger = nums[i];
+    }
+    return subsequencies.size();
+}
+
 // https://www.hackerrank.com/challenges/play-game/problem
 size_t bricksGame(vector<int> arr) {
     auto n = arr.size();
