@@ -394,3 +394,85 @@ int maxProfit(vector<int> &prices) {
     }
     return res;
 }
+
+// https://www.hackerrank.com/challenges/two-robots/
+int twoRobots(int m, vector <vector<int>> queries) {
+    auto nqueries = queries.size();
+    vector <vector<int>> table(nqueries + 1);
+    for (auto &row: table)
+        row = vector<int>(nqueries + 1, numeric_limits<int>::max());
+    table[1][0] = abs(queries[0][1] - queries[0][0]);
+    for (int i = 1; i < nqueries; ++i) {
+        for (int j = 0; j < i; ++j) {
+            // шаг c i
+            auto queryPath = abs(queries[i][1] - queries[i][0]);
+            //
+            auto stepi = table[i][j] + abs(queries[i - 1][1] - queries[i][0]) + queryPath;
+            table[i + 1][j] = min(table[i + 1][j], stepi);
+            // шаг с j
+            auto stepj = table[i][j] + queryPath;
+            if (j != 0)
+                stepj += abs(queries[j - 1][1] - queries[i][0]);
+            table[i + 1][i] = min(table[i + 1][i], stepj);
+        }
+    }
+    return *min_element(table.back().begin(), table.back().end());
+}
+
+// https://leetcode.com/problems/decode-ways/
+enum class WAYS {
+    ZERO, ADD_MIN_ONE, ADD_MIN_TWO, ADD_BOTH
+};
+
+int MAX_CODE = 26;
+
+WAYS hasTwoWays(const char f, const char s) {
+    int fval = f - '0';
+    int sval = s - '0';
+    int total = fval * 10 + sval;
+    // WAYS::ZERO
+    // "00"
+    if (total == 0)
+        return WAYS::ZERO;
+    // "[3, 9]0" [] -> любой из включительно
+    if (total > MAX_CODE && sval == 0)
+        return WAYS::ZERO;
+
+    // WAYS::ADD_MIN_ONE
+    // "0[1,9]"
+    if (fval == 0)
+        return WAYS::ADD_MIN_ONE;
+    // [3,9][1,9]
+    if (total > MAX_CODE)
+        return WAYS::ADD_MIN_ONE;
+
+    // WAYS::ADD_MIN_TWO
+    if (total == 10 || total == 20)
+        return WAYS::ADD_MIN_TWO;
+    //остальные
+    return WAYS::ADD_BOTH;
+}
+
+int numDecodings(string s) {
+    if (s[0] == '0')
+        return 0;
+    int res = 1;
+    int n_minus_1 = 1;
+    int n_minus_2 = 1;
+    int cur = 1;
+    while (cur < s.size()) {
+        auto ways = hasTwoWays(s[cur - 1], s[cur]);
+        if (ways == WAYS::ZERO)
+            return 0;
+        else if (ways == WAYS::ADD_MIN_ONE)
+            res = n_minus_1;
+        else if (ways == WAYS::ADD_MIN_TWO) {
+            res = n_minus_2;
+        } else
+            res = n_minus_1 + n_minus_2;
+        n_minus_2 = n_minus_1;
+        n_minus_1 = res;
+        ++cur;
+    }
+    return res;
+}
