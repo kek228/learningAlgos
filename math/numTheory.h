@@ -40,6 +40,15 @@ vector<bool> SieveEratosthenes(const int n) {
     return nums;
 }
 
+void showPrimes(const int n) {
+    auto res = SieveEratosthenes(n);
+    for (int i = 0; i < res.size(); ++i) {
+        if (res[i])
+            cout << i << ' ';
+    }
+}
+
+
 int gcd(int a, int b) {
     if (b == 0) return a;
     return gcd(b, a % b);
