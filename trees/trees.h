@@ -119,3 +119,33 @@ vector<int> distanceK(Node *root, Node *target, int K) {
 //auto res = distanceK(root, root->l->r, 3);
 //for(auto n: res)
 //cout<<n<<' ';
+
+// https://leetcode.com/problems/count-complete-tree-nodes
+// COMPLETE это такие у которых нижний запонен до упора влево, надо посчитать ноды
+//          1
+//       2     3
+//     4  5  6
+
+int countNodes(TreeNode *root) {
+    if (!root)
+        return 0;
+    queue < TreeNode * > q;
+    q.push(root);
+    int res = 0;
+    while (!q.empty()) {
+        auto node = q.front();
+        q.pop();
+        ++res;
+        if (node->left)
+            q.push(node->left);
+        else
+            return res + q.size();
+
+        if (node->right)
+            q.push(node->right);
+        else
+            return res + q.size();
+
+    }
+    return -1;
+}
