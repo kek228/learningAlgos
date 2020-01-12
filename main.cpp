@@ -17,65 +17,75 @@
 
 using namespace std;
 
-vector<vector<int>> constructTable(int rows, int cols) {
-    vector<vector<int>> table(rows);
-    for (auto &row: table)
-        row = vector<int>(cols, 0);
-    return table;
-}
-
-bool prime(int n) {
-    if (n == 0)
-        return false;
-    if (n == 1)
+bool checkVal(unordered_set<int> &vals, int val) {
+    auto it = vals.find(val);
+    if (it != vals.end())
         return true;
-    for (int x = 2; x * x <= n; ++x) {
-        if (n % x == 0) return false;
-    }
-    return true;
+    return false;
 }
 
-// https://www.hackerrank.com/challenges/prime-xor
-int primeXor(vector<int> a) {
-    const int m = 1000000007;
-    int size = a.size();
-    const unsigned int maxXOR = 8192;
-    auto table = constructTable(size, maxXOR);
-    for (int xorSum = 0; xorSum < maxXOR; ++xorSum) {
-        if (xorSum == a[0])
-            table[0][xorSum] = 1;
+int subarraysWithKDistinct(vector<int> &A, int k) {
+    int size = A.size();
+    unordered_map<int, int> vals;
+    unordered_set<int> possibleVals;
 
+    int e = 0;
+    for (; e < size; ++e) {
+        ++vals[A[e]];
+        possibleVals.insert(A[e]);
+        if (vals.size() == k)
+            break;
     }
-    table[0][0] = 1;
-    //
-    for (unsigned int i = 1; i < size; ++i) {
-        for (unsigned int xorSum = 0; xorSum < maxXOR; ++xorSum) {
-            auto xori = i ^xorSum;
-            auto without = table[i - 1][xorSum];
-            auto with = table[i - 1][xori];
-            table[i][xorSum] = (without + with) % m;
-        }
-    }
-
+    if (vals.size() != k)
+        return 0;
     int res = 0;
-    for (int i = 1; i < maxXOR; ++i) {
-        if (prime(i))
-            res += table[size - 1][i] % m;
+    int b = 0;
+    int at_least1 = 0;
+    bool outMeet = true;
+    while (e < size) {
+        // вернем [b, e] к состоянию минимального подмассива
+        if (outMeet) {
+            outMeet = false;
+            at_least1 = 0;
+        }
+        while (b <= e - k + 1 && vals.size() == k) {
+            --vals[A[b]];
+            if (vals[A[b]] == 0)
+                vals.erase(A[b]);
+            if (vals.size() == k) {
+                ++res;
+                ++at_least1;
+            }
+            ++b;
+        }
+        ++at_least1;
+        ++res;
+        // расширим диапазон
+        while (e < size && vals.size() != k) {
+            ++e;
+            if (e < size && !checkVal(possibleVals, A[e])) {
+                outMeet = true;
+                break;
+            }
+            if (e < size)
+                ++vals[A[e]];
+            if (e < size && !outMeet)
+                res += at_least1;
+        }
+        if (e < size && outMeet) {
+            possibleVals.erase(A[b - 1]);
+            possibleVals.insert(A[e]);
+            ++vals[A[e]];
+        }
     }
     return res;
 }
 
 
-//vector<int> lexicalOrder(int n) {
-//
-//}
-
-
 int main() {
-//    unsigned a = 3511;
-//    unsigned b = 3671;
-//    unsigned i =  a ^ b;
-//    cout<<i<<endl;
-//    cout<<primeXor({3511, 3671, 4153});
+    //vector<int> A = {1, 2, 1, 3, 1, 2, 3,  4};
+    vector<int> A = {2, 2, 1, 2, 2, 2, 1, 1};
+    int k = 2;
+    cout << subarraysWithKDistinct(A, k);
     return 0;
 }
