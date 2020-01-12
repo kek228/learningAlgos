@@ -20,10 +20,4 @@ typedef long long LL;
 
 
 int main() {
-    // cout << isMatch("acdcb", "a*c?b");
-    // cout << isMatch("adceb", "*a*b");
-    // cout << isMatch("aab", "c*a*b");
-    // cout << isMatch("", "a");
-    // cout << isMatch("c", "*?*");
-    cout << isMatch("b", "*?*");
 }
