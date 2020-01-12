@@ -476,3 +476,94 @@ int numDecodings(string s) {
     }
     return res;
 }
+
+// https://leetcode.com/problems/wildcard-matching/
+vector <vector<int>> constructTable(int rows, int cols) {
+    vector <vector<int>> table(rows);
+    for (auto &row: table)
+        row = vector<int>(cols, 0);
+    return table;
+}
+
+bool isMatch(string s, string p) {
+    int rows = p.size();
+    int cols = s.size();
+
+    if (!rows && !cols)
+        return true;
+
+    if (rows == 1 && p[0] == '*')
+        return true;
+
+    if (!rows && cols)
+        return false;
+
+
+    if (rows && !cols)
+        return false;
+
+
+    auto table = constructTable(rows, cols);
+    bool match = false;
+
+    if (p[0] == '*')
+        table[0] = vector<int>(cols, 1);
+    else {
+        if (p[0] == '?' || p[0] == s[0])
+            table[0][0] = 1;
+        match = true;
+    }
+
+    for (int i = 1; i < rows; ++i) {
+        if (p[i] == '*' && table[i - 1][0])
+            table[i][0] = true;
+        else {
+            if (p[i - 1] == '*' && (p[i] == s[0] || p[i] == '?') && table[i - 1][0] && !match)
+                table[i][0] = true;
+            match = true;
+        }
+    }
+    for (int i = 1; i < rows; ++i) {
+        for (int j = 1; j < cols; ++j) {
+            if (p[i] == '*')
+                table[i][j] = table[i - 1][j - 1] || table[i - 1][j] || table[i][j - 1];
+            else {
+                if (!table[i - 1][j - 1])
+                    table[i][j] = false;
+                else {
+                    if (p[i] == '?')
+                        table[i][j] = true;
+                    else {
+                        if (p[i] == s[j])
+                            table[i][j] = true;
+                        else
+                            table[i][j] = false;
+                    }
+                }
+            }
+        }
+    }
+    return table[rows - 1][cols - 1];
+}
+
+
+
+
+// https://www.hackerrank.com/challenges/swappermutation/problem
+//int main() {
+//    const int N = 5;
+//    const int K = 4;
+//    int dp[N + 1][K + 1];
+//
+//    for(int i = 0; i <= N; i++)
+//        dp[i][0] = 1;
+//
+//    for(int i = 1; i <= N; i++) {
+//        for (int j = 1; j <= K; j++) {
+//            for (int k = 0; k <= i - 1 && k <= j; k++) {
+//                dp[i][j] += dp[i - 1][j - k];
+//            }
+//        }
+//    }
+//    return 0;
+//}
