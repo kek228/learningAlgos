@@ -17,66 +17,104 @@
 #include <list>
 
 using namespace std;
-
-unordered_map<char, int> createCounter(const string &s) {
-    unordered_map<char, int> res;
-    for (auto c: s)
-        ++res[c];
-    return res;
-}
-
-bool cmp(unordered_map<char, int> &f, unordered_map<char, int> &s) {
-    for (auto &fc: f) {
-        auto sc = s.find(fc.first);
-        if (sc == s.end())
-            return false;
-        if (fc.second != sc->second)
-            return false;
-    }
-    return true;
-}
-
-bool equal(unordered_map<char, int> &f, unordered_map<char, int> &s) {
-    if (!f.size() && !s.size())
-        return true;
-    if (f.size() != s.size())
-        return false;
-    return cmp(f, s) && cmp(s, f);
-}
-
-
-vector<vector<string>> groupAnagrams(vector<string> &strs) {
-    int size = strs.size();
-    if (strs.size() == 0)
-        return {};
-
-    list<pair<unordered_map<char, int>, int>> annagrams;
-    for (int i = 0; i < size; ++i) {
-        annagrams.push_back({createCounter(strs[i]), i});
-    }
-    vector<vector<string>> res;
-    vector<string> cur;
-    while (!annagrams.empty()) {
-        cur.push_back(strs[annagrams.front().second]);
-        auto curangr = annagrams.front().first;
-        annagrams.pop_front();
-        auto it = annagrams.begin();
-        while (it != annagrams.end()) {
-            if (equal(curangr, (*it).first)) {
-                cur.push_back(strs[it->second]);
-                annagrams.erase(it++);
-            } else
-                ++it;
+int ithOfTwoSorted(const int i, const vector<int> &first, const vector<int> &second) {
+    int b1 = 0;
+    int e1 = first.size() - 1;
+    int b2 = 0;
+    int e2 = second.size() - 1;
+    int last = 0;
+    if (i == 0)
+        return min(first[b1], second[b2]);
+    int from = 0;
+    int to = e1 + e2;
+    while (b1 <= e1 && b2 <= e2) {
+        int _max = max(first[e1], second[e2]);
+        int _min = min(first[b1], second[b2]);
+        if (_min == _max)
+            return _max;
+        int m = (_max + _min) / 2;
+        auto firstGreater = upper_bound(first.begin() + b1, first.begin() + e1 + 1, m);
+        int firstLast = firstGreater - first.begin() - 1;
+        auto secondGreater = upper_bound(second.begin() + b2, second.begin() + e2 + 1, m);
+        int secondLast = secondGreater - second.begin() - 1;
+        last = firstLast + secondLast + 1;
+        if (i <= last) {
+            e1 = firstLast;
+            e2 = secondLast;
+            to = last;
+        } else {
+            b1 = firstLast + 1;
+            b2 = secondLast + 1;
+            from = b1 + b2;
         }
-        res.push_back(cur);
-        cur = {};
     }
-    return res;
+    if (b1 <= e1) {
+        if (b1 == e1)
+            return first[b1];
+        return first[b1 + i - from];
+
+    }
+    if (b2 <= e2) {
+        if (b2 == e2)
+            return second[b2];
+        return second[b2 + i - from];
+    }
+    return 0;
+}
+
+
+double findMedianSortedArrays(const vector<int> &a, const vector<int> &b) {
+    int asize = a.size();
+    int bsize = b.size();
+    int size = asize + bsize;
+    if (!asize && !bsize)
+        return 0;
+    if (!asize && bsize) {
+        if (bsize % 2 == 1)
+            return b[bsize / 2];
+        else {
+            int m = size / 2;
+            auto f = b[m];
+            auto s = b[m - 1];
+            return double(f + s) / 2;
+        }
+    }
+
+    if (asize && !bsize) {
+        if (asize % 2 == 1)
+            return a[asize / 2];
+        else {
+            int m = size / 2;
+            auto f = a[m];
+            auto s = a[m - 1];
+            return double(f + s) / 2;
+        }
+    }
+
+    if (size % 2 == 1)
+        return ithOfTwoSorted(size / 2, a, b);
+    else {
+        int m = size / 2;
+        auto f = ithOfTwoSorted(m, a, b);
+        auto s = ithOfTwoSorted(m - 1, a, b);
+        return double(f + s) / 2;
+    }
 }
 
 int main() {
-    // vector<string> strs = {"eat", "tea", "tan", "ate", "nat", "bat"};
-    vector<string> strs = {"a", "a", "a"};
-    auto res = groupAnagrams(strs);
+//    vector<int> first = {1, 2};
+//    vector<int> second = {3, 4};
+//    cout<<findMedianSortedArrays(first, second);
+//    // cout<<ithOfTwoSorted(1, first, second)<<endl;
+////    for(int i = 0; i < 4; ++i){
+////        cout<<ithOfTwoSorted(i, first, second)<<endl;
+////    }
+    vector<int> first = {1, 1};
+    vector<int> second = {1, 1};
+    cout << ithOfTwoSorted(1, first, second) << endl;
+//    for(int i = 0; i < 4; ++i){
+//        cout<<ithOfTwoSorted(i, first, second)<<endl;
+//    }
+
     return 0;
 }
