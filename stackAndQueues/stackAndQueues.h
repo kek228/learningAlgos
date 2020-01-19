@@ -60,3 +60,34 @@ string removeDuplicateLetters(string s) {
     }
     return res;
 }
+
+// https://leetcode.com/problems/jump-game-ii/
+// сделал jump-game, но видимо счетерил.
+// TODO подумать над жадным решением
+int jump(vector<int> &nums) {
+    int size = nums.size();
+    if (size < 2)
+        return 0;
+    deque<int> path;
+    path.push_back(size - 1);
+    for (int i = size - 2; i >= 0; --i) {
+        if (i + nums[i] == path.front()) {
+            path.push_front(i);
+            continue;
+        }
+
+        int firstPossible = path.size();
+        auto it = path.rbegin();
+        for (; it != path.rend(); ++it) {
+            if (i + nums[i] >= *it) {
+                --firstPossible;
+                break;
+            }
+            --firstPossible;
+        }
+        for (int j = 0; j < firstPossible; ++j)
+            path.pop_front();
+        path.push_front(i);
+    }
+    return path.size() - 1;
+}
