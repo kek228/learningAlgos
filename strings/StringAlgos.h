@@ -62,3 +62,53 @@ private:
     const string _original;
     vector<int> _suffixArray;
 };
+
+
+// топ за свои деньги
+//string s1 = "abcdefg";
+//string s2 = "bcdafgk";
+
+int countConvertOps(const string &s1, const string &s2, const int alphabetSize) {
+    unordered_map<char, char> s1Tos2Mapping;
+    for (int i = 0; i < s1.size(); ++i) {
+        if (s1[i] == s2[i])
+            continue;
+        auto fchar = s1Tos2Mapping.find(s1[i]);
+        if (fchar == s1Tos2Mapping.end())
+            s1Tos2Mapping[s1[i]] = s2[i];
+        else {
+            // a a b case
+            // b c d
+            if (fchar->second != s2[i])
+                return -1;
+        }
+    }
+
+    // if alphabet is exhausted, we are unable to make a single change
+    if (s1Tos2Mapping.size() == alphabetSize)
+        return -1;
+    // count simple changes and cycle changes
+    int res = 0;
+    bool swapNeed = false;
+    unordered_set<char> cycleFound;
+    for (const auto &mapping: s1Tos2Mapping) {
+        // simple swap
+        auto char2InS1 = s1Tos2Mapping.find(mapping.second);
+        if (char2InS1 == s1Tos2Mapping.end()) {
+            ++res;
+        }
+            // check cycle
+        else {
+            // cycle found
+            if (char2InS1->second == mapping.first) {
+                if (cycleFound.find(mapping.first) == cycleFound.end()) {
+                    res += 3;
+                    cycleFound.insert(mapping.first);
+                    cycleFound.insert(mapping.second);
+                }
+            } else
+                swapNeed = true;
+        }
+    }
+    return res + s1Tos2Mapping.size() + swapNeed;
+}
