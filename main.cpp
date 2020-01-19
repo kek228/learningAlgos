@@ -17,6 +17,7 @@
 #include <limits>
 #include <list>
 #include <map>
+#include <functional>
 
 using namespace std;
 
