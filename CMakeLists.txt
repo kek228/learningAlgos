@@ -6,4 +6,3 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -pedantic")
 
 #add_executable(LongestCommonSequence lcs.cpp)
 add_executable(algorithms2019 main.cpp)
-#add_executable(kek lcs.cpp)

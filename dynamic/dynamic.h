@@ -546,8 +546,61 @@ bool isMatch(string s, string p) {
     return table[rows - 1][cols - 1];
 }
 
+// https://leetcode.com/problems/unique-binary-search-trees-ii/
+// дано число n, а ты построй все возможные бин деревья ПОИСКА с нодами от 1 до n
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
 
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
 
+class Solution {
+    using TreeList = vector<TreeNode *>;
+    vector <vector<TreeList>> results;
+public:
+    TreeList allFromTo(int first, int last) {
+        if (first > last) {
+            return {nullptr};
+        }
+        if (results[first - 1][last - 1].size() != 0) {
+            return results[first - 1][last - 1];
+        }
+        TreeList res;
+        for (int i = first; i <= last; ++i) {
+            auto possibleLeftTrees = allFromTo(first, i - 1);
+            auto possibleRightTrees = allFromTo(i + 1, last);
+            for (auto &leftTree: possibleLeftTrees) {
+                for (auto &rightTree: possibleRightTrees) {
+                    auto root = new TreeNode{i};
+                    root->left = leftTree;
+                    root->right = rightTree;
+                    res.push_back(root);
+                }
+            }
+        }
+        results[first - 1][last - 1] = move(res);
+        return results[first - 1][last - 1];
+    }
+
+    vector<TreeNode *> generateTrees(int n) {
+        if (n == 0)
+            return {};
+        results.resize(n);
+        for (auto &row: results) {
+            row.resize(n);
+        }
+        //
+        for (int i = 1; i <= n; ++i) {
+            auto root = new TreeNode(i);
+            results[i - 1][i - 1] = TreeList{root};
+        }
+        //
+        auto res = allFromTo(1, n);
+        return res;
+    }
+};
 
 // https://www.hackerrank.com/challenges/swappermutation/problem
 //int main() {
