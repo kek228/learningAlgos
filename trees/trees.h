@@ -149,3 +149,29 @@ int countNodes(TreeNode *root) {
     }
     return -1;
 }
+
+void findMin(TreeNode *root, std::vector<int> &res) {
+    if (!root)
+        return;
+    findMin(root->left, res);
+    res.push_back(root->val);
+    findMin(root->right, res);
+}
+
+
+// https://leetcode.com/problems/minimum-absolute-difference-in-bst
+// внезапно ниасилил простую сходу
+int getMinimumDifference(TreeNode *root) {
+    if (!root)
+        return 0;
+    std::vector<int> res;
+    findMin(root, res);
+
+    int diff = numeric_limits<int>::max();
+    for (int i = 0; i < res.size() - 1; ++i) {
+        int curD = res[i + 1] - res[i];
+        if (curD < diff)
+            diff = curD;
+    }
+    return diff;
+}
