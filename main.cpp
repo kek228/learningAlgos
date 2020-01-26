@@ -23,5 +23,6 @@ using namespace std;
 
 
 int main() {
+    int a = numeric_limits<int>::min();
     return 0;
 }

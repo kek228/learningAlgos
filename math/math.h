@@ -53,3 +53,28 @@ int gcd(int a, int b) {
     if (b == 0) return a;
     return gcd(b, a % b);
 }
+
+
+// https://leetcode.com/problems/rotate-function
+// найди максимальный поворот вправо F(k) = 0 * Bk[0] + 1 * Bk[1] + ... + (n-1) * Bk[n-1].
+// F функция от массива. Прикольный пример на подумать.
+int maxRotateFunction(vector<int> &A) {
+    int size = A.size();
+    if (size == 0)
+        return 0;
+    int64_t simpleSum = 0;
+    int64_t sum = 0;
+    for (int i = 0; i < size; ++i) {
+        sum += A[i] * i;
+        simpleSum += A[i];
+    }
+    int res = sum;
+    for (int rot = 1; rot < A.size(); ++rot) {
+        int64_t newSum = sum + simpleSum -
+                         ((int64_t) A[size - rot]) * size;
+        if (newSum > res)
+            res = newSum;
+        sum = newSum;
+    }
+    return res;
+}
