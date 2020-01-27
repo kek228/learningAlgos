@@ -23,6 +23,6 @@ using namespace std;
 
 
 int main() {
-    int a = numeric_limits<int>::min();
+    cout << myAtoi("-2147483648");
     return 0;
 }

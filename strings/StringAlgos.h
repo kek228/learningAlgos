@@ -112,3 +112,74 @@ int countConvertOps(const string &s1, const string &s2, const int alphabetSize) 
     }
     return res + s1Tos2Mapping.size() + swapNeed;
 }
+
+// https://leetcode.com/problems/string-to-integer-atoi
+bool isDigit(const char c) {
+    return c >= '0' && c <= '9';
+}
+
+int myAtoi(string str) {
+    int size = str.size();
+    if (size == 0)
+        return 0;
+    //
+    int start = 0;
+    int sign = 1;
+    for (; start < size; ++start) {
+        char c = str[start];
+        if (isDigit(c))
+            break;
+        if (str[start] == '-') {
+            sign = -1;
+            break;
+        }
+        if (str[start] == '+')
+            break;
+        if (c != ' ')
+            return 0;
+    }
+    if (start == size)
+        return 0;
+    if (!isDigit(str[start])) {// - или +
+        ++start;
+        if (start == size)
+            return 0;
+        if (!isDigit(str[start]))
+            return 0;
+    }
+    // тут start строго на первой цифре(может и 0)
+    // тут может быть только рядо 0й
+    while (start < size && str[start] == '0') {
+        ++start;
+        if (start < size && !isDigit(str[start]))
+            return 0;
+    }
+    int last = start; // start строго на первую цифру
+    for (; last < size; ++last) {
+        if (!isDigit(str[last]))
+            break;
+    }// после цикла last или знак или == size
+    --last; // на последнюю цифру
+    int degree = 0;
+    int res = 0;
+    for (int i = last; i >= start; --i) {
+        if ((degree == 9 && str[i] > '2') || degree > 9) {
+            if (sign > 0)
+                return numeric_limits<int>::max();
+            else
+                return numeric_limits<int>::min();
+        }
+
+        int add = (str[i] - '0') * pow(10, degree) * sign;
+        if (sign > 0) {
+            if (res > numeric_limits<int>::max() - add)
+                return numeric_limits<int>::max();
+        } else if (sign < 0) {
+            if (res < numeric_limits<int>::min() - add)
+                return numeric_limits<int>::min();
+        }
+        res += add;
+        ++degree;
+    }
+    return res;
+}
