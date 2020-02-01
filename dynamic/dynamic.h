@@ -602,6 +602,36 @@ public:
     }
 };
 
+// https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule
+// отлично зашла SparseTable
+int minDifficulty(vector<int> &jobDifficulty, int days) {
+    int jobs = jobDifficulty.size();
+    if (days > jobs)
+        return -1;
+    vector <vector<int>> results(days);
+    for (auto &day: results)
+        day = vector<int>(jobs, numeric_limits<int>::max());
+
+    SparseTable table(jobDifficulty);
+    int maxJobsPerDay = jobs - days + 1;
+    for (int i = 0; i < maxJobsPerDay; ++i)
+        results[0][i] = table.getMax(0, i);
+
+    for (int day = 0; day < days - 1; ++day) {
+        int curLastJob = day + maxJobsPerDay;
+        for (int job = day; job < curLastJob; ++job) {
+            for (int nextJob = job + 1; nextJob < curLastJob + 1; ++nextJob) {
+                int jval = table.getMax(job + 1, nextJob) + results[day][job];
+                results[day + 1][nextJob] = min(results[day + 1][nextJob], jval);
+            }
+
+        }
+    }
+    return results[days - 1][jobs - 1];
+
+}
+
+
 // https://www.hackerrank.com/challenges/swappermutation/problem
 //int main() {
 //    const int N = 5;

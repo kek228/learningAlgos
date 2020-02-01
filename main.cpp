@@ -23,6 +23,8 @@ using namespace std;
 
 
 int main() {
-    cout << myAtoi("-2147483648");
+    // vector<int> jobDifficulty = {11, 111, 22, 222, 33, 333, 44, 444};
+    vector<int> jobDifficulty = {6, 5, 4, 3, 2, 1};
+    cout << minDifficulty(jobDifficulty, 2);
     return 0;
 }

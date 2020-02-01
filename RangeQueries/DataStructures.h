@@ -45,5 +45,41 @@ private:
     }
 
 private:
-    std::vector<int64_t> table;
+    std::vector <int64_t> table;
+};
+
+
+// Полезная штука для запросов min/max от b до e включительно
+class SparseTable {
+public:
+    explicit SparseTable(const vector<int> &nums) {
+        int size = nums.size();
+        int k = log2(size) + 1;
+        _table.resize(k);
+        for (auto &t: _table)
+            t = vector<int>(size, 0);
+        constructTable(nums);
+    }
+
+    // ВКЛЮЧАЯ e
+    int getMax(const int b, const int e) {
+        int k = log2(e - b + 1);
+        return max(_table[k][b], _table[k][e - pow(2, k) + 1]);
+    }
+
+private:
+    void constructTable(const vector<int> &nums) {
+        int size = nums.size();
+        for (int i = 0; i < size; ++i)
+            _table[0][i] = nums[i];
+        for (int k = 1; k < _table.size(); ++k) {
+            int curLast = size - pow(2, k) + 1;
+            int next = pow(2, k - 1);
+            for (int i = 0; i < curLast; ++i)
+                _table[k][i] = max(_table[k - 1][i], _table[k - 1][i + next]);
+        }
+    }
+
+private:
+    vector <vector<int>> _table;
 };
