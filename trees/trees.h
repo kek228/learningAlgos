@@ -175,3 +175,70 @@ int getMinimumDifference(TreeNode *root) {
     }
     return diff;
 }
+
+// https://leetcode.com/problems/maximum-width-of-binary-tree
+// максимальная ширина бинарного дерева
+// фишка это вычисление позиции ноды в очереди
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+TreeNode *root = new TreeNode{1};
+root->
+left = new TreeNode{2};
+root->left->
+left = new TreeNode{4};
+root->left->
+right = new TreeNode{5};
+root->
+right = new TreeNode{3};
+root->right->
+right = new TreeNode{6};
+cout<<
+widthOfBinaryTree(root);
+//         1
+//       /   \
+//      2     3
+//     / \     \
+//    4   5     6
+
+int widthOfBinaryTree(TreeNode *root) {
+    if (!root)
+        return 0;
+    queue <pair<TreeNode *, size_t>> q;
+    q.push({root, 0});
+    //
+    int res = 0;
+    int dst = 0;
+    pair < TreeNode * , int > firstFound = {root, 0};
+    size_t curMaxId = 1;
+    while (!q.empty()) {
+        auto curNode = q.front();
+        q.pop();
+        if (curNode.second < curMaxId) {
+            dst = curNode.second - firstFound.second + 1;
+            if (dst > res)
+                res = dst;
+        } else {
+            firstFound = curNode;
+            curMaxId = curMaxId * 2 + 1;
+        }
+
+
+        // сквозной индекс
+        if (curNode.first->left) {
+            size_t ind = curNode.second * 2 + 1;
+            q.push({curNode.first->left, ind});
+        }
+        if (curNode.first->right) {
+            size_t ind = curNode.second * 2 + 2;
+            q.push({curNode.first->right, ind});
+        }
+        //
+    }
+    return res;
+}
