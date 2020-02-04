@@ -91,3 +91,38 @@ int jump(vector<int> &nums) {
     }
     return path.size() - 1;
 }
+
+// https://leetcode.com/problems/sliding-window-maximum/
+// супер показательная задача на очередь
+vector<int> maxSlidingWindow(vector<int> &nums, int k) {
+    int size = nums.size();
+    if (size == 0)
+        return {};
+
+    deque<int> decrQ;
+    decrQ.push_front(0);
+    for (int i = 1; i < k; ++i) {
+        if (nums[i] >= nums[decrQ.front()]) {
+            while (!decrQ.empty() && nums[i] >= nums[decrQ.front()])
+                decrQ.pop_front();
+            decrQ.push_front(i);
+        } else {
+            decrQ.push_front(i);
+        }
+    }
+    vector<int> res;
+    res.push_back(nums[decrQ.back()]);
+    for (int i = k; i < size; ++i) {
+        if (decrQ.back() < i - k + 1)
+            decrQ.pop_back();
+        if (nums[i] >= nums[decrQ.front()]) {
+            while (!decrQ.empty() && nums[i] >= nums[decrQ.front()])
+                decrQ.pop_front();
+            decrQ.push_front(i);
+        } else {
+            decrQ.push_front(i);
+        }
+        res.push_back(nums[decrQ.back()]);
+    }
+    return res;
+}

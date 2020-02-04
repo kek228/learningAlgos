@@ -2,7 +2,7 @@
 // Неделя была посвященна всяким рекурсивным обходам, бэктрекингу
 
 
-// подмножества длинной size
+// подмножества длинной subsetsize из n элементов
 // идея проста, мы каждый раз либо добовляем число к подмножеству, либо пропускаем
 // i тут это счетчик ПРОСМОТРЕННЫХ, не обязательно добавленных элементов
 void genSubsets(vector<int> &subset, int n, int i, int subsetsize){
@@ -15,10 +15,11 @@ void genSubsets(vector<int> &subset, int n, int i, int subsetsize){
         return;
     }
     subset.push_back(i);
-    genSubsets(subset, n, i + 1, n);
+    genSubsets(subset, n, i + 1, subsetsize);
     subset.pop_back();
-    genSubsets(subset, n, i + 1, n);
+    genSubsets(subset, n, i + 1, subsetsize);
 }
+
 
 // Все перестановки с повторениями
 void genAllPermutsWithDoubles(vector<int> &permut, int from, int to, int permutsize, int &c){

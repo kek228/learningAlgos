@@ -21,7 +21,27 @@
 
 using namespace std;
 
+//bool canPartitionKSubsets(vector<int>& nums, int k) {
+//    int size = nums.size();
+//    int S = 0;
+//    for(const auto n: nums)
+//        S +=n;
+//    if(S % k != 0)
+//        return false;
+//    int targetSum = S / k;
+//    vector<int> trgSumSets;
+//    int maxSetSize = size - k + 1;
+//    unordered_set<int> check;
+//
+//    for (int i = 1; i < maxSetSize; ++i) {
+//
+//    }
+//
+//}
+
+
 
 int main() {
+    vector<int> subset;
     return 0;
 }
