@@ -280,6 +280,9 @@ int substringDiff(int k, string s1, string s2) {
     return res;
 }
 
+// 2 ПОХОЖИХ ЗАДАЧИ
+// максимальная последовательность, которая образует палиндром и
+// минимальное кол-во вставок в строку чтобы стал палиндром
 // https://leetcode.com/problems/longest-palindromic-subsequence/
 int longestPalindromeSubseq(string s) {
     int size = s.size();
@@ -307,6 +310,35 @@ int longestPalindromeSubseq(string s) {
     }
     return resTable[size - 1][size - 1];
 }
+
+// https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/
+int minInsertions(string s) {
+    int size = s.size();
+    if (size < 2)
+        return 0;
+    vector <vector<int>> resTable(size);
+    for (auto &r: resTable)
+        r = vector<int>(size, 0);
+
+    for (int i = 1; i < size; ++i) {
+        if (s[i] == s[i - 1])
+            resTable[1][i] = 0;
+        else
+            resTable[1][i] = 1;
+    }
+
+    // строка длинна, col последний знак
+    for (int row = 2; row < size + 1; ++row) {
+        for (int col = row; col < size; ++col) {
+            if (s[col] == s[col - row])
+                resTable[row][col] = resTable[row - 2][col - 1];
+            else
+                resTable[row][col] = min(resTable[row - 1][col - 1], resTable[row - 1][col]) + 1;
+        }
+    }
+    return resTable[size - 1][size - 1];
+}
+
 
 // https://www.hackerrank.com/challenges/strplay/problem
 int playWithWords(string s) {
