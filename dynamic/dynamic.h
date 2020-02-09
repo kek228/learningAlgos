@@ -663,6 +663,90 @@ int minDifficulty(vector<int> &jobDifficulty, int days) {
 
 }
 
+// ДИНАМИКА НА ПОДМНОЖЕСТВАХ
+/*
+ https://leetcode.com/problems/shortest-path-visiting-all-nodes
+ кратчайший путь через все вершины в графе
+    vector<vector<int>> graph = {
+            {1},
+            {0, 2, 4},
+            {1, 3,  4},
+            {2},
+            {2},
+    };
+
+    vector<vector<int>> graph = {
+            {1,  2,  3},
+            {0},
+            {0},
+            {0},
+    };
+    */
+int dfs(vector <vector<int>> &graph, int i, int j) {
+    queue <pair<int, int>> q;
+    q.push({i, 0});
+    int res = 0;
+    while (!q.empty()) {
+        auto[cur, dst]  = q.front();
+        q.pop();
+        if (cur == j)
+            return dst;
+        for (auto v: graph[cur]) {
+            q.push({v, dst + 1});
+        }
+        ++res;
+    }
+    return -1;
+}
+
+int shortestPathLength(vector <vector<int>> &graph) {
+    int n = graph.size();
+    if (n < 2)
+        return 0;
+    vector <vector<int>> pathes(n);
+    for (auto &row: pathes)
+        row = vector<int>(n, numeric_limits<int>::max());
+    for (int i = 0; i < n; ++i) {
+        for (int j = i; j < n; ++j) {
+            int path = dfs(graph, i, j);
+            if (path == -1)
+                return -1;
+            pathes[i][j] = path;
+            pathes[j][i] = path;
+        }
+    }
+    //
+    int setsN = 1 << n;
+    vector <vector<int>> results(n);
+    for (auto &row: results)
+        row = vector<int>(setsN + 1, numeric_limits<int>::max());
+
+    for (int i = 0; i < n; ++i) {
+        int curset = 1 << i;
+        results[i][curset] = 0;
+    }
+
+    for (int curset = 1; curset < setsN; ++curset) {
+        if ((curset & (curset - 1)) == 0)
+            continue;
+        //
+        for (int lastV = 0; lastV < n; ++lastV) {
+            if (curset & (1 << lastV)) {
+                int setWithout = curset ^(1 << lastV);
+                for (int i = 0; i < n; ++i) {
+                    if (setWithout & (1 << i)) {
+                        results[lastV][curset] = min(results[lastV][curset], results[i][setWithout] + pathes[i][lastV]);
+                    }
+                }
+            }
+        }
+    }
+    //
+    int res = numeric_limits<int>::max();
+    for (int i = 0; i < n; ++i)
+        res = min(res, results[i][setsN - 1]);
+    return res;
+}
 
 // https://www.hackerrank.com/challenges/swappermutation/problem
 //int main() {

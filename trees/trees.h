@@ -242,3 +242,34 @@ int widthOfBinaryTree(TreeNode *root) {
     }
     return res;
 }
+
+// https://leetcode.com/problems/merge-two-binary-trees
+// занятная задача на мерж деревьев
+void merge(TreeNode *n1, TreeNode *n2, TreeNode *n1root, bool left) {
+    if (!n2)
+        return;
+    if (!n1) {
+        if (left) {
+            n1root->left = new TreeNode(n2->val);
+            n1 = n1root->left;
+        } else {
+            n1root->right = new TreeNode(n2->val);
+            n1 = n1root->right;
+        }
+    } else {
+        n1->val += n2->val;
+    }
+    merge(n1->left, n2->left, n1, true);
+    merge(n1->right, n2->right, n1, false);
+}
+
+TreeNode *mergeTrees(TreeNode *t1, TreeNode *t2) {
+    if (!t1)
+        return t2;
+    if (!t2)
+        return t1;
+    t1->val += t2->val;
+    merge(t1->left, t2->left, t1, true);
+    merge(t1->right, t2->right, t1, false);
+    return t1;
+}
