@@ -280,9 +280,10 @@ int substringDiff(int k, string s1, string s2) {
     return res;
 }
 
-// 2 ПОХОЖИХ ЗАДАЧИ
+// 3 ПОХОЖИХ ЗАДАЧИ
 // максимальная последовательность, которая образует палиндром и
 // минимальное кол-во вставок в строку чтобы стал палиндром
+// Найди минимальное разбиение строки, так чтобы все строки в разбиении были палиндромы
 // https://leetcode.com/problems/longest-palindromic-subsequence/
 int longestPalindromeSubseq(string s) {
     int size = s.size();
@@ -337,6 +338,51 @@ int minInsertions(string s) {
         }
     }
     return resTable[size - 1][size - 1];
+}
+
+// https://leetcode.com/problems/palindrome-partitioning-ii/
+int minCut(string s) {
+    int size = s.size();
+    if (!size)
+        return 0;
+    vector <vector<int>> palLength(size);
+    vector <vector<bool>> isPalindrome(size);
+    for (auto &r: isPalindrome)
+        r = vector<bool>(size, false);
+    isPalindrome[0] = vector<bool>(size, true);
+
+    for (int i = 0; i < size; ++i) {
+        palLength[i].push_back(1);
+    }
+    for (int i = 1; i < size; ++i) {
+        if (s[i] == s[i - 1]) {
+            isPalindrome[1][i] = true;
+            palLength[i - 1].push_back(2);
+        }
+    }
+
+    for (int row = 2; row < size; ++row) {
+        for (int col = row; col < size; ++col)
+            if (isPalindrome[row - 2][col - 1] && s[col] == s[col - row]) {
+                palLength[col - row].push_back(row + 1);
+                isPalindrome[row][col] = true;
+            }
+
+    }
+    vector<int> result(size, numeric_limits<int>::max());
+    result[size - 1] = 0;
+    for (int i = size - 2; i >= 0; --i) {
+        for (int j = palLength[i].size() - 1; j >= 0; --j) {
+            int step = palLength[i][j];
+            if (i + step == size) {
+                result[i] = 0;
+            } else {
+                result[i] = min(result[i], 1 + result[i + step]);
+            }
+        }
+    }
+
+    return result[0];
 }
 
 
