@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iterator>
 #include <set>
-//#include <optional>
+#include <optional>
 #include <stdint.h>
 #include <deque>
 #include <limits>
@@ -21,109 +21,53 @@
 
 using namespace std;
 
-bool checkS1inS2(unordered_map<char, int> &s1, unordered_map<char, int> &s2) {
-    for (const auto &c1: s1) {
-        auto c2 = s2.find(c1.first);
-        if (c2 == s2.end())
-            return false;
-        if (c2->second < c1.second)
-            return false;
-    }
-    return true;
-}
-
-
-void erase(unordered_map<char, int> &smap, const char c) {
-    auto it = smap.find(c);
-    it->second--;
-    if (!it->second)
-        smap.erase(it);
-}
-
-bool canShrink(const char c, unordered_map<char, int> &smap, unordered_map<char, int> &tmap) {
-    auto inT = tmap.find(c);
-    if (inT == tmap.end()) {
-        return true;
-    }
-    auto inS = smap.find(c);
-    if (inS->second > inT->second)
-        return true;
-    return false;
-}
-
-string minWindow(string s, string t) {
-    if (t.empty())
-        return t;
-    unordered_map<char, int> tmap;
-    for (auto c: t)
-        ++tmap[c];
-    unordered_map<char, int> smap;
-    int i = 0;
-    int size = s.size();
-    for (; i < size; ++i) {
-        if (tmap.find(s[i]) != tmap.end())
-            break;
-    }
-    if (t.size() == 1) {
-        if (i == size)
-            return "";
-        else
-            return t;
-    }
-
-    int j = i;
-    int resi = -1;
-    int resj = -1;
-    int ressize = numeric_limits<int>::max();
-    while (j < size) {
-        const char c = s[j];
-        ++smap[c];
-        bool found = checkS1inS2(tmap, smap);
-        if (found) {
-            // попробуем уменьшить окно
-            while (found && i <= j) {
-                erase(smap, s[i]);
-                found = checkS1inS2(tmap, smap);
-                ++i;
-            }
-            int wsize = j - i + 2;
-            if (wsize < ressize) {
-                ressize = wsize;
-                resi = i - 1;
-                resj = j;
-            }
-            // сейчас found == false, попробуем еще подрезать интервал
-            while (canShrink(s[i], smap, tmap) && i < j) {
-                erase(smap, s[i]);
-                ++i;
-            }
-        }
-        ++j;
-    }
-    bool found = checkS1inS2(tmap, smap);
-    if (found) {
-        while (found && i <= j) {
-            erase(smap, s[i]);
-            found = checkS1inS2(tmap, smap);
-            ++i;
-        }
-        int wsize = j - i + 2;
-        if (wsize < ressize) {
-            ressize = wsize;
-            resi = i - 1;
-            resj = j;
+int maxProfit(vector<int> &prices) {
+    int size = prices.size();
+    if (size == 0)
+        return 0;
+    vector<int> forwardRes(size, 0);
+    int minEl = prices[0];
+    for (int i = 1; i < size; ++i) {
+        if (prices[i] > minEl) {
+            int val = prices[i] - minEl;
+            if (val > forwardRes[i - 1])
+                forwardRes[i] = val;
+            else
+                forwardRes[i] = forwardRes[i - 1];
+        } else {
+            forwardRes[i] = forwardRes[i - 1];
+            minEl = prices[i];
         }
     }
+    //
+    vector<int> backwardRes(size, 0);
+    int maxEl = prices[size - 1];
+    for (int i = size - 2; i >= 0; --i) {
+        if (prices[i] < maxEl) {
+            int val = maxEl - prices[i];
+            if (val > backwardRes[i + 1])
+                backwardRes[i] = val;
+            else
+                backwardRes[i] = backwardRes[i + 1];
 
-    if (resi != -1) {
-        return s.substr(resi, resj - resi + 1);
+        } else {
+            backwardRes[i] = backwardRes[i + 1];
+            maxEl = prices[i];
+        }
     }
-    return "";
+    int res = 0;
+    for (int i = 0; i < size - 1; ++i) {
+        int curRes = forwardRes[i] + backwardRes[i + 1];
+        if (curRes > res)
+            res = curRes;
+    }
+    if (forwardRes[size - 1] > res)
+        res = forwardRes[size - 1];
+    return res;
 }
-
 
 int main() {
-    // cout << minWindow("ADOBECODEBANC", "ABC").data();
-    cout << minWindow("aaddabdbddc", "abc").data();
+    vector<int> nums = {1, 2, 3, 4, 5};
+    cout << maxProfit(nums);
     return 0;
 }
