@@ -794,6 +794,52 @@ int shortestPathLength(vector <vector<int>> &graph) {
     return res;
 }
 
+// https://leetcode.com/problems/partition-to-k-equal-sum-subsets
+int leastSignifisantBit(int n) {
+    return (n & (~n + 1));
+}
+
+bool _canPartitionKSubsets(vector<int> &nums, vector<int> &cache, int s, int k, const int baseSum, uint32_t subset) {
+    string cacheVal = to_string(s) + to_string(k);
+    if (cache[subset] != -1)
+        return cache[subset];
+    if (s == 0) {
+        --k;
+        s = baseSum;
+    }
+    if (k == 0)
+        return true;
+    if (s < 0)
+        return false;
+
+    uint32_t bits = subset;
+    while (bits != 0) {
+        uint32_t bit = leastSignifisantBit(bits);
+        bits = bits & (~bit);
+        const uint32_t newSubset = subset ^bit;
+        uint32_t element = nums[log2(bit)];
+        const int newSum = s - element;
+        bool res = _canPartitionKSubsets(nums, cache, newSum, k, baseSum, newSubset);
+        if (res) {
+            cache[subset] = true;
+            return true;
+        }
+    }
+    cache[subset] = false;
+    return false;
+
+
+}
+
+bool canPartitionKSubsets(vector<int> &nums, int k) {
+    int subsetsN = 1 << nums.size();
+    vector<int> cache(subsetsN, -1);
+    int sum = 0;
+    for (auto n: nums)
+        sum += n;
+    sum /= k;
+    return _canPartitionKSubsets(nums, cache, sum, k, sum, subsetsN - 1);
+}
 // https://www.hackerrank.com/challenges/swappermutation/problem
 //int main() {
 //    const int N = 5;

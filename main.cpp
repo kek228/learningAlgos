@@ -45,10 +45,6 @@ int inverseBits(const uint32_t subset, const uint32_t maxSubset) {
     return res & (maxSubset - 1);
 }
 
-//int tallestBillboard(vector<int> &rods) {
-//
-//}
-
 bool _canPartitionKSubsets(vector<int> &nums, vector<int> &cache, int s, int k, const int baseSum, uint32_t subset) {
     string cacheVal = to_string(s) + to_string(k);
     if (cache[subset] != -1)
