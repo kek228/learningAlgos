@@ -20,65 +20,52 @@
 #include <functional>
 
 using namespace std;
-struct Bar {
-    int index;
-    int h;
-    int usedh;
+
+struct Conn {
+    int id;
+    int w;
 };
 
-int trap(vector<int> &height) {
-    int size = height.size();
+int networkDelayTime(vector<vector<int>> &times, int N, int K) {
+    const int size = times.size();
     if (size == 0)
         return 0;
-    stack<Bar> barStack;
-    int start = 1;
-    for (; start < size; ++start) {
-        if (height[start] < height[start - 1])
-            break;
+    vector<vector<Conn>> connections(N);
+    for (const auto &t: times) {
+        connections[t[0] - 1].push_back({t[1] - 1, t[2]});
     }
-    start--;
-    int res = 0;
-    barStack.push({start, height[start], 0});
-    for (int i = start + 1; i < size; ++i) {
-        if (height[i] >= barStack.top().h) {
-            const int newh = height[i];
-            while (!barStack.empty()) {
-                if (barStack.top().h < newh) {
-                    auto topBar = barStack.top();
-                    barStack.pop();
-                    res += (topBar.h - topBar.usedh) * (i - topBar.index - 1);
-                    if (!barStack.empty())
-                        barStack.top().usedh = topBar.h;
-                } else {
-                    auto topBar = barStack.top();
-                    res += (newh - topBar.usedh) * (i - topBar.index - 1);
-                    break;
-                }
-            }
+    //
+    const auto inf = numeric_limits<int>::max();
+    --K;
+    vector<int> results(N, inf);
+    results[K] = 0;
+    vector<bool> visited(N, false);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q; //res to v
+    q.push({0, K});
+    while (!q.empty()) {
+        auto curN = q.top();
+        const int cur = curN.second;
+        const int curRes = curN.first;
+        q.pop();
+        if (visited[cur])
+            continue;
+        for (const auto &conn: connections[cur]) {
+            const int v = conn.id;
+            if (visited[v])
+                continue;
+            const int posDst = curRes + conn.w;
+            results[v] = min(results[v], posDst);
+            q.push({results[v], v});
         }
-        barStack.push({i, height[i], 0});
+        visited[cur] = true;
+
     }
+    int res = *max_element(results.begin(), results.end());
+    if (res == inf)
+        return -1;
     return res;
 }
 
-
 int main() {
-    vector<int> nums = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
-    cout << trap(nums);
     return 0;
 }
-
-
-//vector<string> req_skills = {"java","nodejs","reactjs"};
-//vector<vector<string>> people = {{"java"},{"nodejs"},{"nodejs","reactjs"}};
-//cout << smallestSufficientTeam(req_skills, people);
-
-// vector<int> rods = {1,2,2,3,3};
-// vector<int> rods = {2, 4, 8, 16};
-// vector<int> rods = {1,2,3,4,5,6};
-// vector<int> rods = {1,2};
-// vector<int> rods = {100, 100};
-
-// vector<int> rods = {4, 3, 2, 3, 5, 2, 1};
-// rods = { 5, 5, 4, 1 };
-// rods = { 5, 5, 4, 1 };
