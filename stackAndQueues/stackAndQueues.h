@@ -210,3 +210,46 @@ int largestRectangleArea(vector<int> &heights) {
     }
     return res;
 }
+
+// https://leetcode.com/problems/trapping-rain-water/ почти без ошибок
+// ВСЕГДА ПРОВЕРЯЙ НА ПУСТОТУ ЕСЛИ СДЕЛАЛ ПОП
+struct Bar {
+    int index;
+    int h;
+    int usedh;
+};
+
+int trap(vector<int> &height) {
+    int size = height.size();
+    if (size == 0)
+        return 0;
+    stack <Bar> barStack;
+    int start = 1;
+    for (; start < size; ++start) {
+        if (height[start] < height[start - 1])
+            break;
+    }
+    start--;
+    int res = 0;
+    barStack.push({start, height[start], 0});
+    for (int i = start + 1; i < size; ++i) {
+        if (height[i] >= barStack.top().h) {
+            const int newh = height[i];
+            while (!barStack.empty()) {
+                if (barStack.top().h < newh) {
+                    auto topBar = barStack.top();
+                    barStack.pop();
+                    res += (topBar.h - topBar.usedh) * (i - topBar.index - 1);
+                    if (!barStack.empty())
+                        barStack.top().usedh = topBar.h;
+                } else {
+                    auto topBar = barStack.top();
+                    res += (newh - topBar.usedh) * (i - topBar.index - 1);
+                    break;
+                }
+            }
+        }
+        barStack.push({i, height[i], 0});
+    }
+    return res;
+}

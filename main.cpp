@@ -20,84 +20,65 @@
 #include <functional>
 
 using namespace std;
+struct Bar {
+    int index;
+    int h;
+    int usedh;
+};
 
-int leastSignifisantBit(int n) {
-    return (n & (~n + 1));
-}
-
-bool
-checkSubset(const vector<int> &rods, const vector<vector<bool>> &sumsSubsets, const int sum, const uint32_t subset) {
-    uint32_t bits = subset;
-    while (bits != 0) {
-        uint32_t bit = leastSignifisantBit(bits);
-        bits = bits & (~bit);
-        uint32_t element = rods[log2(bit)];
-        const int checkSum = sum - element;
-        uint32_t subsetWithoutEl = subset ^bit;
-        if (checkSum >= 0 && sumsSubsets[checkSum][subsetWithoutEl])
-            return true;
+int trap(vector<int> &height) {
+    int size = height.size();
+    if (size == 0)
+        return 0;
+    stack<Bar> barStack;
+    int start = 1;
+    for (; start < size; ++start) {
+        if (height[start] < height[start - 1])
+            break;
     }
-    return false;
-}
-
-int inverseBits(const uint32_t subset, const uint32_t maxSubset) {
-    uint32_t res = ~subset;
-    return res & (maxSubset - 1);
-}
-
-bool _canPartitionKSubsets(vector<int> &nums, vector<int> &cache, int s, int k, const int baseSum, uint32_t subset) {
-    string cacheVal = to_string(s) + to_string(k);
-    if (cache[subset] != -1)
-        return cache[subset];
-    if (s == 0) {
-        --k;
-        s = baseSum;
-    }
-    if (k == 0)
-        return true;
-    if (s < 0)
-        return false;
-
-    uint32_t bits = subset;
-    while (bits != 0) {
-        uint32_t bit = leastSignifisantBit(bits);
-        bits = bits & (~bit);
-        const uint32_t newSubset = subset ^bit;
-        uint32_t element = nums[log2(bit)];
-        const int newSum = s - element;
-        bool res = _canPartitionKSubsets(nums, cache, newSum, k, baseSum, newSubset);
-        if (res) {
-            cache[subset] = true;
-            return true;
+    start--;
+    int res = 0;
+    barStack.push({start, height[start], 0});
+    for (int i = start + 1; i < size; ++i) {
+        if (height[i] >= barStack.top().h) {
+            const int newh = height[i];
+            while (!barStack.empty()) {
+                if (barStack.top().h < newh) {
+                    auto topBar = barStack.top();
+                    barStack.pop();
+                    res += (topBar.h - topBar.usedh) * (i - topBar.index - 1);
+                    if (!barStack.empty())
+                        barStack.top().usedh = topBar.h;
+                } else {
+                    auto topBar = barStack.top();
+                    res += (newh - topBar.usedh) * (i - topBar.index - 1);
+                    break;
+                }
+            }
         }
+        barStack.push({i, height[i], 0});
     }
-    cache[subset] = false;
-    return false;
-
-
-}
-
-bool canPartitionKSubsets(vector<int> &nums, int k) {
-    int subsetsN = 1 << nums.size();
-    vector<int> cache(subsetsN, -1);
-    int sum = 0;
-    for (auto n: nums)
-        sum += n;
-    sum /= k;
-    return _canPartitionKSubsets(nums, cache, sum, k, sum, subsetsN - 1);
+    return res;
 }
 
 
 int main() {
-    // vector<int> rods = {1,2,2,3,3};
-    // vector<int> rods = {2, 4, 8, 16};
-    // vector<int> rods = {1,2,3,4,5,6};
-    // vector<int> rods = {1,2};
-    // vector<int> rods = {100, 100};
-
-    vector<int> nums = {4, 3, 2, 3, 5, 2, 1};
-    //nums = { 5, 5, 4, 1 };
-    //nums = { 5, 5, 4, 1 };
-    cout << canPartitionKSubsets(nums, 3);
+    vector<int> nums = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
+    cout << trap(nums);
     return 0;
 }
+
+
+//vector<string> req_skills = {"java","nodejs","reactjs"};
+//vector<vector<string>> people = {{"java"},{"nodejs"},{"nodejs","reactjs"}};
+//cout << smallestSufficientTeam(req_skills, people);
+
+// vector<int> rods = {1,2,2,3,3};
+// vector<int> rods = {2, 4, 8, 16};
+// vector<int> rods = {1,2,3,4,5,6};
+// vector<int> rods = {1,2};
+// vector<int> rods = {100, 100};
+
+// vector<int> rods = {4, 3, 2, 3, 5, 2, 1};
+// rods = { 5, 5, 4, 1 };
+// rods = { 5, 5, 4, 1 };
