@@ -131,82 +131,37 @@ vector<int> maxSlidingWindow(vector<int> &nums, int k) {
 // https://leetcode.com/problems/largest-rectangle-in-histogram
 struct Rect {
     int start;
-    int height;
-    int area;
-
-    int length() {
-        return area / height;
-    }
+    int h;
 };
 
-void addRectangle(const int h, vector <Rect> &rects, int insertPos, int &res) {
-    if (rects.empty() && h != 0)
-        rects.push_back({insertPos, h, h});
-    if (rects.empty() && h == 0)
-        return;
-
-    auto last = rects.back();
-    int newStart = insertPos;
-    while (!rects.empty() && last.height > h) {
-        last.area = last.height * (insertPos - last.start);
-        if (last.area > res) {
-            res = last.area;
-        }
-        int possibleA = (insertPos - last.start + 1) * h;
-        if (possibleA > res)
-            res = possibleA;
-
-        newStart = last.start;
-        rects.pop_back();
-        if (!rects.empty())
-            last = rects.back();
-    }
-    if (rects.empty()) {
-        if (h == 0)
-            return;
-
-        int newArea = h * (insertPos - newStart + 1);
-        rects.push_back({newStart, h, newArea});
-    } else {
-        // back().height <= h
-        // обновляем в любом случае
-        int backArea = rects.back().height * (insertPos - rects.back().start + 1);
-        rects.back().area = backArea;
-
-        if (rects.back().height < h) {
-            int newArea = h * (insertPos - newStart + 1);
-            rects.push_back({newStart, h, newArea});
-        }
-    }
-}
-
 int largestRectangleArea(vector<int> &heights) {
-    int size = heights.size();
+    const int size = heights.size();
     if (size == 0)
         return 0;
-    vector <Rect> rects;
-    int start = 0;
-    while (start < size && heights[start] == 0)
-        ++start;
-    if (start == size)
-        return 0;
-
+    vector <Rect> rectStack;
+    rectStack.push_back({0, heights[0]});
     int res = 0;
-    for (int i = start; i < size; ++i) {
-        addRectangle(heights[i], rects, i, res);
-        if (rects.size() == 100500) {
-            cout << 1;
+    for (int i = 1; i < size; ++i) {
+        if (heights[i] > rectStack.back().h) {
+            rectStack.push_back({i, heights[i]});
+        }
+        if (heights[i] < rectStack.back().h) {
+            int lastStart = -1;
+            while (!rectStack.empty() && heights[i] < rectStack.back().h) {
+                auto popedRect = rectStack.back();
+                rectStack.pop_back();
+                const int popedArea = (i - popedRect.start) * popedRect.h;
+                lastStart = popedRect.start;
+                if (popedArea > res)
+                    res = popedArea;
+            }
+            rectStack.push_back({lastStart, heights[i]});
         }
     }
-    if (rects.empty())
-        return res;
-
-    int lastPos = rects.back().start + rects.back().length() - 1;
-    for (int i = 0; i < rects.size(); ++i) {
-        auto r = rects[i];
-        r.area = r.height * (lastPos - r.start + 1);
-        if (r.area > res)
-            res = r.area;
+    for (const auto &r: rectStack) {
+        const int area = (size - r.start) * r.h;
+        if (area > res)
+            res = area;
     }
     return res;
 }
