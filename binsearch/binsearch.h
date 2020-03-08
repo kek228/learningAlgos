@@ -214,3 +214,36 @@ double findMedianSortedArrays(const vector<int> &a, const vector<int> &b) {
         return double(f + s) / 2;
     }
 }
+
+// https://leetcode.com/problems/search-insert-position
+// бинпоиск с поиском места для вставки
+int searchInsert(vector<int> &nums, int target) {
+    const int size = nums.size();
+    if (size == 0)
+        return 0;
+    if (size == 1) {
+        if (nums[0] < target)
+            return 1;
+        else
+            return 0;
+    }
+
+    int b = 0;
+    int e = size - 1;
+    while (b < e) {
+        int m = (b + e) / 2;
+        if (nums[m] > target) {
+            e = m;
+        } else if (nums[m] < target) {
+            b = m + 1;
+        } else {
+            return m;
+        }
+    }
+    if (b == size - 1 && nums[b] < target) {
+        return size;
+    }
+    if (e == 0 && nums[e] > target)
+        return 0;
+    return e;
+}
