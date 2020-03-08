@@ -113,6 +113,39 @@ int countConvertOps(const string &s1, const string &s2, const int alphabetSize) 
     return res + s1Tos2Mapping.size() + swapNeed;
 }
 
+// https://leetcode.com/problems/string-transforms-into-another-string/
+// КРАЙНЕ похожа на топ за свои деньги
+bool canConvert(string str1, string str2) {
+    int size = str1.size();
+    if (!size)
+        return true;
+    unordered_map<char, char> firstToSecond;
+    unordered_set<char> secondUsed;
+    for (int i = 0; i < size; ++i) {
+        auto existed = firstToSecond.find(str1[i]);
+        if (existed != firstToSecond.end()) {
+            if (existed->second != str2[i])
+                return false;
+        } else {
+            firstToSecond[str1[i]] = str2[i];
+            secondUsed.insert(str2[i]);
+        }
+    }
+    const int usedLetters = firstToSecond.size();
+    if (usedLetters < 26)
+        return true;
+
+    if (secondUsed.size() < 26)
+        return true;
+
+    for (const auto f1To2: firstToSecond) {
+        if (f1To2.first != f1To2.second)
+            return false;
+    }
+
+    return true;
+}
+
 // https://leetcode.com/problems/string-to-integer-atoi
 bool isDigit(const char c) {
     return c >= '0' && c <= '9';
