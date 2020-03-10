@@ -1,65 +1,48 @@
 #pragma once
 
 // https://leetcode.com/problems/remove-duplicate-letters
-// нужно удалить все повторы и вывести первую в лексиграф порядки строку без повторов
-// решил мапой из dqueue
-bool okToInsert(map<char, deque<int>> &charIds, decltype(charIds.begin()) start,
-                int lastId, int idFrom) {
-    auto it = start;
-    ++it;
-    if (it == charIds.end())
-        it = charIds.begin();
-    while (it->second.front() < lastId)
-        it->second.pop_front();
-    //
-    while (it != start) {
-        if (it->second.back() < idFrom)
-            return false;
-        ++it;
-        if (it == charIds.end())
-            it = charIds.begin();
-        while (it->second.front() < lastId)
-            it->second.pop_front();
-    }
-    return true;
-}
-
-std::pair<char, int> findNextChar(map<char, deque<int>> &charIds, int lastId) {
-    auto wantInsert = charIds.begin();
-    while (wantInsert->second.front() < lastId)
-        wantInsert->second.pop_front();
-    //
-    while (!okToInsert(charIds, wantInsert, lastId, wantInsert->second.front())) {
-        ++wantInsert;
-    }
-    char nextChar = wantInsert->first;
-    int newLastId = wantInsert->second.front();
-    charIds.erase(wantInsert);
-    return {nextChar, newLastId};
-}
-
-string removeDuplicateLetters(string s) {
-    int size = s.size();
-    if (size == 0)
+// Удаление повторов чтобы был лексиграфический порядок
+string smallestSubsequence(string text) {
+    if (text.empty())
         return "";
-    map<char, deque<int>> charIds;
-    for (int i = 0; i < size; ++i) {
-        auto c = s[i];
-        auto qptr = charIds.find(c);
-        if (qptr == charIds.end())
-            charIds[c] = {};
-        charIds[c].push_back(i);
-    }
+    string res;
+    unordered_map<char, int> frequencies;
+    for (const char c: text)
+        ++frequencies[c];
+    unordered_set<char> inRes;
     //
-    string res = "";
-    char nextChar;
-    int lastId = -1;
-    while (!charIds.empty()) {
-        tie(nextChar, lastId) = findNextChar(charIds, lastId);
-        res.push_back(nextChar);
+    res.push_back(text[0]);
+    inRes.insert(text[0]);
+    --frequencies[text[0]];
+    if (frequencies[text[0]] == 0)
+        frequencies.erase(text[0]);
+    for (int i = 1; i < text.size(); ++i) {
+        const char c = text[i];
+        // if it's not in solution
+        if (inRes.find(c) == inRes.end()) {
+            // this is not the last c character
+            while (!res.empty() && res.back() > c) {
+                const char last = res.back();
+                // no more last characters
+                if (frequencies.find(last) == frequencies.end())
+                    break;
+                else {
+                    inRes.erase(res.back());
+                    res.pop_back();
+                }
+            }
+            res.push_back(c);
+            inRes.insert(c);
+        }
+        --frequencies[c];
+        if (frequencies[c] == 0)
+            frequencies.erase(c);
     }
     return res;
 }
+
+
+
 
 // https://leetcode.com/problems/jump-game-ii/
 // сделал jump-game, но видимо счетерил.

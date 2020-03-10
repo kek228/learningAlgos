@@ -69,96 +69,46 @@ using namespace std;
 //    }
 //};
 
-struct TreeNode {
-    int val;
-    TreeNode *left;
-    TreeNode *right;
-
-    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
-};
-
-class Solution {
-    int res = numeric_limits<int>::min();
-public:
-    int whatReturn(int path, int val) {
-        int curRes = 0;
-        if (path >= 0) {
-            if (val >= 0)
-                res = max(res, val + path);
-            else
-                res = max(res, path);
-            return val + path;
-        } else {
-            return val;
+string smallestSubsequence(string text) {
+    if (text.empty())
+        return "";
+    string res;
+    unordered_map<char, int> frequencies;
+    for (const char c: text)
+        ++frequencies[c];
+    unordered_set<char> inRes;
+    //
+    res.push_back(text[0]);
+    inRes.insert(text[0]);
+    --frequencies[text[0]];
+    if (frequencies[text[0]] == 0)
+        frequencies.erase(text[0]);
+    for (int i = 1; i < text.size(); ++i) {
+        const char c = text[i];
+        // if it's not in solution
+        if (inRes.find(c) == inRes.end()) {
+            // this is not the last c character
+            while (!res.empty() && res.back() > c) {
+                const char last = res.back();
+                // no more last characters
+                if (frequencies.find(last) == frequencies.end())
+                    break;
+                else {
+                    inRes.erase(res.back());
+                    res.pop_back();
+                }
+            }
+            res.push_back(c);
+            inRes.insert(c);
         }
+        --frequencies[c];
+        if (frequencies[c] == 0)
+            frequencies.erase(c);
     }
-
-    optional<int> _maxPathSum(TreeNode *root) {
-        if (!root)
-            return numeric_limits<int>::min();;
-        if (res < 0)
-            res = max(res, root->val);
-        auto maxL = _maxPathSum(root->left);
-        auto maxR = _maxPathSum(root->right);
-        int curRes = 0;
-
-        return 0;
-    }
-
-    int maxPathSum(TreeNode *root) {
-        _maxPathSum(root);
-        return res;
-    }
-};
-
-
-int _maxCoins(const vector<int> &nums, const int l, const int r, vector<vector<int>> &cache) {
-    if (l + 1 == r) {
-        return 0;
-    }
-    if (cache[l][r] != -1)
-        return cache[l][r];
-    int res = 0;
-    for (int i = l + 1; i < r; ++i) {
-        res = max(res, nums[l] * nums[i] * nums[r] +
-                       _maxCoins(nums, l, i, cache) + _maxCoins(nums, i, r, cache));
-    }
-    cache[l][r] = res;
     return res;
 }
 
-int maxCoins(vector<int> &nums) {
-    if (nums.empty())
-        return 0;
-    nums.insert(nums.begin(), 1);
-    nums.push_back(1);
-    const int size = nums.size();
-    vector<vector<int>> cache(size);
-    for (auto &v: cache)
-        v = vector<int>(size, -1);
-    return _maxCoins(nums, 0, size - 1, cache);
-}
-
 int main() {
-    //Solution sol;
-////    cout<<sol.numberOfPatterns(1, 1);
-
-//    TreeNode *root = new TreeNode{-2};
-//    root->left = new TreeNode{-1};
-//    root->right = new TreeNode{3};
-    //cout << sol.maxPathSum(root);
-    vector<int> nums = {3, 1, 5, 8};
-    cout << maxCoins(nums);
+    cout << smallestSubsequence("bdaccdbddc"); // "adbc"
     return 0;
 }
-
-
-// matrix:
-// std::vector of length 4, capacity 4 =
-// {std::vector of length 5, capacity 5 = {49 '1', 48 '0', 49 '1', 48 '0', 48 '0'},
-// std::vector of length 5, capacity 5 = {49 '1', 48 '0', 49 '1', 49 '1', 49 '1'},
-// std::vector of length 5, capacity 5 = {49 '1', 49 '1', 49 '1', 49 '1', 49 '1'},
-// std::vector of length 5, capacity 5 = {49 '1', 48 '0', 48 '0', 49 '1', 48 '0'}}
-// ["great","acting","skills"]
-// ["fine","painting","talent"]
-// [["great","fine"],["drama","acting"],["skills","talent"]]
