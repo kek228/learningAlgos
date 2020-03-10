@@ -709,6 +709,37 @@ int minDifficulty(vector<int> &jobDifficulty, int days) {
 
 }
 
+
+// https://leetcode.com/problems/burst-balloons/
+// КРАЙНЕ показательная задача на divide and conquer
+int _maxCoins(const vector<int> &nums, const int l, const int r, vector <vector<int>> &cache) {
+    if (l + 1 == r) {
+        return 0;
+    }
+    if (cache[l][r] != -1)
+        return cache[l][r];
+    int res = 0;
+    for (int i = l + 1; i < r; ++i) {
+        res = max(res, nums[l] * nums[i] * nums[r] +
+                       _maxCoins(nums, l, i, cache) + _maxCoins(nums, i, r, cache));
+    }
+    cache[l][r] = res;
+    return res;
+}
+
+int maxCoins(vector<int> &nums) {
+    if (nums.empty())
+        return 0;
+    nums.insert(nums.begin(), 1);
+    nums.push_back(1);
+    const int size = nums.size();
+    vector <vector<int>> cache(size);
+    for (auto &v: cache)
+        v = vector<int>(size, -1);
+    return _maxCoins(nums, 0, size - 1, cache);
+}
+
+
 // ДИНАМИКА НА ПОДМНОЖЕСТВАХ
 /*
  https://leetcode.com/problems/shortest-path-visiting-all-nodes
