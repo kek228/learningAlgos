@@ -118,3 +118,37 @@ public:
         }
     }
 };
+
+// https://leetcode.com/problems/reverse-integer
+// достаточно неплохой код разворота числа (123 -> 321)
+int reverse(int x) {
+    if (x == 0)
+        return 0;
+    int d = 9;
+    if (x != numeric_limits<int>::min())
+        d = log10(abs(x));
+
+    int muld = 0;
+    int curx = x;
+    int res = 0;
+    while (d >= 0) { // -123
+        const int degree = pow(10, d); // 100
+        const int mul = pow(10, muld); // 1
+        const int addBase = curx / degree;
+        if (x > 0 && !(addBase <= numeric_limits<int>::max() / mul))
+            return 0;
+        if (x < 0 && !(addBase >= numeric_limits<int>::min() / mul))
+            return 0;
+
+        const int add = addBase * mul;
+        if (x > 0 && !(res <= numeric_limits<int>::max() - add))
+            return 0;
+        if (x < 0 && !(res >= numeric_limits<int>::min() - add))
+            return 0;
+        res += add; //
+        --d;
+        ++muld;
+        curx -= addBase * degree;
+    }
+    return res;
+}
