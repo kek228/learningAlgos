@@ -216,3 +216,68 @@ int myAtoi(string str) {
     }
     return res;
 }
+
+// https://leetcode.com/problems/remove-invalid-parentheses
+// верни все варианты валидных строк со скобками, с минимальным кол-вом удалений
+// покрывает несколько тем работы со скобками
+class Solution {
+    unordered_set <string> res;
+    int maxOpenDel = 0;
+    int maxCloseDel = 0;
+public:
+    void
+    _removeInvalidParentheses(const string &s, const string &cur, const int i, const int oc, const int odel,
+                              const int cdel) {
+        if (i == s.size()) {
+            if (oc == 0) {
+                res.insert(cur);
+            }
+            return;
+        }
+        //
+        if (s[i] == '(') {
+            if (odel < maxOpenDel) {// delete one open bracket
+                _removeInvalidParentheses(s, cur, i + 1, oc, odel + 1, cdel);
+            }
+            const string withOpened = cur + "(";
+            _removeInvalidParentheses(s, withOpened, i + 1, oc + 1, odel, cdel);
+        } else if (s[i] == ')') {
+            if (oc == 0) { // cannot take this
+                _removeInvalidParentheses(s, cur, i + 1, oc, odel, cdel + 1);
+            } else {
+                if (cdel < maxCloseDel) { // del one
+                    _removeInvalidParentheses(s, cur, i + 1, oc, odel, cdel + 1);
+                }
+                const string withClosed = cur + ")";
+                _removeInvalidParentheses(s, withClosed, i + 1, oc - 1, odel, cdel);
+            }
+        } else {
+            const string withCur = cur + s[i];
+            _removeInvalidParentheses(s, withCur, i + 1, oc, odel, cdel);
+        }
+    }
+
+    vector <string> removeInvalidParentheses(string s) {
+        const int size = s.size();
+        if (s.empty())
+            return {""};
+        int oc = 0;
+        for (const char c: s) {
+            if (c == '(')
+                ++oc;
+            else if (c == ')') {
+                if (oc == 0)
+                    ++maxCloseDel;
+                else
+                    --oc;
+            }
+        }
+        maxOpenDel = oc;
+        string cur = "";
+        _removeInvalidParentheses(s, cur, 0, 0, 0, 0);
+        vector <string> answer;
+        for (const string &sres: res)
+            answer.emplace_back(sres);
+        return answer;
+    }
+};
