@@ -214,21 +214,6 @@ void find_components(const int start, const vector <vector<int>> &graph, vector<
 }
 
 // finding cycles and connected components
-bool cycles(const int cur, const vector <vector<int>> &graph, vector<int> &which_comp) {
-    which_comp[cur] = 0;
-    for (int i = 0; i < graph[cur].size(); ++i) {
-        const int next = graph[cur][i];
-        if (which_comp[next] == 0)
-            return true;
-        if (which_comp[next] == 2)
-            continue;
-        if (cycles(next, graph, which_comp))
-            return true;
-    }
-    which_comp[cur] = 1;
-    return false;
-}
-
 void find_components(const int start, const vector <vector<int>> &graph, vector<int> &which_comp,
                      unordered_map<int, unordered_set<int>> &components) {
     queue<int> q;
@@ -259,6 +244,21 @@ void find_components(const int start, const vector <vector<int>> &graph, vector<
     components[compC] = newComp;
 }
 
+bool cycles(const int cur, const vector <vector<int>> &graph, vector<int> &which_comp) {
+    which_comp[cur] = 0;
+    for (int i = 0; i < graph[cur].size(); ++i) {
+        const int next = graph[cur][i];
+        if (which_comp[next] == 0)
+            return true;
+        if (which_comp[next] == 2)
+            continue;
+        if (cycles(next, graph, which_comp))
+            return true;
+    }
+    which_comp[cur] = 1;
+    return false;
+}
+
 bool canFinish(int numCourses, vector <vector<int>> &prerequisites) {
     if (numCourses < 2 || prerequisites.empty())
         return true;
@@ -273,8 +273,10 @@ bool canFinish(int numCourses, vector <vector<int>> &prerequisites) {
         if (which_comp[i] == -1)
             find_components(i, graph, which_comp, components);
     }
-    if (components.size() != 1)
-        return false;
-    which_comp = vector<int>(numCourses, -1);
-    return !cycles(0, graph, which_comp);
+    for (auto &comp: components) {
+        which_comp = vector<int>(numCourses, -1);
+        if (cycles(*comp.second.begin(), graph, which_comp))
+            return false;
+    }
+    return true;
 }

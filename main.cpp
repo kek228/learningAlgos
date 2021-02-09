@@ -81,19 +81,18 @@ bool canFinish(int numCourses, vector<vector<int>> &prerequisites) {
         if (which_comp[i] == -1)
             find_components(i, graph, which_comp, components);
     }
-    if (components.size() != 1)
-        return false;
-    which_comp = vector<int>(numCourses, -1);
-    return !cycles(0, graph, which_comp);
+    for (auto &comp: components) {
+        which_comp = vector<int>(numCourses, -1);
+        if (cycles(*comp.second.begin(), graph, which_comp))
+            return false;
+    }
+    return true;
 }
 
-
 int main() {
-    // [[1,4],[2,4],[3,1],[3,2]]
-
-    // vector<vector<int>> prerequisites = {{1,4},{2,4},{3,1},{3,2}};
-    vector<vector<int>> prerequisites = {{1, 0},
-                                         {0, 1}};
-    cout << canFinish(2, prerequisites);
+    vector<vector<int>> prerequisites = {{0, 2},
+                                         {1, 2},
+                                         {2, 0}};
+    cout << canFinish(3, prerequisites);
     return 0;
 }
