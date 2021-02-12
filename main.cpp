@@ -22,77 +22,56 @@
 
 using namespace std;
 
-void find_components(const int start, const vector<vector<int>> &graph, vector<int> &which_comp,
-                     unordered_map<int, unordered_set<int>> &components) {
-    queue<int> q;
-    q.push(start);
-    unordered_set<int> newComp;
-    newComp.insert(start);
-    const int compC = components.size();
-    while (q.size()) {
-        const int cur = q.front();
-        q.pop();
-        which_comp[cur] = compC;
-        newComp.insert(cur);
-        for (const int conn: graph[cur]) {
-            if (which_comp[conn] != compC && which_comp[conn] != -1) {
-                if (which_comp[conn] != -1) {
-                    auto comp = components.find(which_comp[conn]);
-                    for (const int v: comp->second) {
-                        which_comp[v] = compC;
-                        newComp.insert(v);
-                    }
-                    components.erase(comp);
-                }
-            } else if (which_comp[conn] == -1) {
-                q.push(conn);
-            }
+class Solution {
+public:
+    vector<bool> visited;
+    vector<int> lowestReachable;
+    vector<int> times;
+    vector<vector<int>> res;
+    int curTime = 0;
+
+    void exploreConnections(const vector<vector<int>> &graph, const int v, const int p) {
+        times[v] = curTime;
+        ++curTime;
+        visited[v] = true;
+        for (const auto w: graph[v]) {
+            if (!visited[w]) {
+                exploreConnections(graph, w, v);
+                // был ли заход через след вершину в вершину ДО текущей
+                lowestReachable[v] = min(lowestReachable[v], lowestReachable[w]);
+                if (lowestReachable[w] > times[v]) // случай когда такого захода не было
+                    res.push_back({v, w});
+            } else if (visited[w] && w != p) // уперлись в серую ( случай петли)
+                lowestReachable[v] = min(lowestReachable[v], times[w]);
         }
     }
-    components[compC] = newComp;
-}
 
-bool cycles(const int cur, const vector<vector<int>> &graph, vector<int> &which_comp) {
-    which_comp[cur] = 0;
-    for (int i = 0; i < graph[cur].size(); ++i) {
-        const int next = graph[cur][i];
-        if (which_comp[next] == 0)
-            return true;
-        if (which_comp[next] == 2)
-            continue;
-        if (cycles(next, graph, which_comp))
-            return true;
-    }
-    which_comp[cur] = 1;
-    return false;
-}
+    vector<vector<int>> criticalConnections(int n, vector<vector<int>> &connections) {
+        visited = vector<bool>(n, false);
+        times = vector<int>(n, 0);
+        lowestReachable = vector<int>(n, n + 1);
 
-bool canFinish(int numCourses, vector<vector<int>> &prerequisites) {
-    if (numCourses < 2 || prerequisites.empty())
-        return true;
-    unordered_map<int, unordered_set<int>> components;
-    vector<vector<int>> graph(numCourses, vector<int>());
-    //
-    for (auto &p : prerequisites)
-        graph[p[1]].push_back(p[0]);
-    //
-    vector<int> which_comp(numCourses, -1);
-    for (int i = 0; i < numCourses; ++i) {
-        if (which_comp[i] == -1)
-            find_components(i, graph, which_comp, components);
+        vector<vector<int>> graph(n, vector<int>());
+        for (auto &conn: connections) {
+            graph[conn[0]].push_back(conn[1]);
+            graph[conn[1]].push_back(conn[0]);
+        }
+        for (int i = 0; i < n; ++i) {
+            if (!visited[i])
+                exploreConnections(graph, i, -1);
+        }
+        return res;
     }
-    for (auto &comp: components) {
-        which_comp = vector<int>(numCourses, -1);
-        if (cycles(*comp.second.begin(), graph, which_comp))
-            return false;
-    }
-    return true;
-}
+};
 
 int main() {
-    vector<vector<int>> prerequisites = {{0, 2},
-                                         {1, 2},
-                                         {2, 0}};
-    cout << canFinish(3, prerequisites);
+    Solution s;
+    // [[0,1],[1,2],[2,0],[1,3]]
+    vector<vector<int>> connections{{0, 1},
+                                    {1, 2},
+                                    {2, 0},
+                                    {1, 3}};
+    auto res = s.criticalConnections(connections.size(), connections);
+
     return 0;
 }

@@ -244,18 +244,18 @@ void find_components(const int start, const vector <vector<int>> &graph, vector<
     components[compC] = newComp;
 }
 
-bool cycles(const int cur, const vector <vector<int>> &graph, vector<int> &which_comp) {
-    which_comp[cur] = 0;
+bool cycles(const int cur, const vector <vector<int>> &graph, vector<int> &visited) {
+    visited[cur] = 0;
     for (int i = 0; i < graph[cur].size(); ++i) {
         const int next = graph[cur][i];
-        if (which_comp[next] == 0)
+        if (visited[next] == 0)
             return true;
-        if (which_comp[next] == 2)
+        if (visited[next] == 2)
             continue;
         if (cycles(next, graph, which_comp))
             return true;
     }
-    which_comp[cur] = 1;
+    visited[cur] = 1;
     return false;
 }
 
@@ -280,3 +280,47 @@ bool canFinish(int numCourses, vector <vector<int>> &prerequisites) {
     }
     return true;
 }
+
+// https://leetcode.com/problems/critical-connections-in-a-network
+// Tarjan's strongly connected components
+class Solution {
+public:
+    vector<bool> visited;
+    vector<int> lowestReachable;
+    vector<int> times;
+    vector <vector<int>> res;
+    int curTime = 0;
+
+    void exploreConnections(const vector <vector<int>> &graph, const int v, const int p) {
+        times[v] = curTime;
+        ++curTime;
+        visited[v] = true;
+        for (const auto w: graph[v]) {
+            if (!visited[w]) {
+                exploreConnections(graph, w, v);
+                // был ли заход через след вершину в вершину ДО текущей
+                lowestReachable[v] = min(lowestReachable[v], lowestReachable[w]);
+                if (lowestReachable[w] > times[v]) // случай когда такого захода не было
+                    res.push_back({v, w});
+            } else if (visited[w] && w != p) // уперлись в серую ( случай петли)
+                lowestReachable[v] = min(lowestReachable[v], times[w]);
+        }
+    }
+
+    vector <vector<int>> criticalConnections(int n, vector <vector<int>> &connections) {
+        visited = vector<bool>(n, false);
+        times = vector<int>(n, 0);
+        lowestReachable = vector<int>(n, n + 1);
+
+        vector <vector<int>> graph(n, vector<int>());
+        for (auto &conn: connections) {
+            graph[conn[0]].push_back(conn[1]);
+            graph[conn[1]].push_back(conn[0]);
+        }
+        for (int i = 0; i < n; ++i) {
+            if (!visited[i])
+                exploreConnections(graph, i, -1);
+        }
+        return res;
+    }
+};
