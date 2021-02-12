@@ -281,3 +281,131 @@ public:
         return answer;
     }
 };
+
+// https://leetcode.com/problems/integer-to-english-words
+class Solution {
+    unordered_map<int, string> baseNames = {
+            {1, "One"},
+            {2, "Two"},
+            {3, "Three"},
+            {4, "Four"},
+            {5, "Five"},
+            {6, "Six"},
+            {7, "Seven"},
+            {8, "Eight"},
+            {9, "Nine"},
+
+    };
+
+    unordered_map<int, string> dozens = {
+            {2, "Twenty"},
+            {3, "Thirty"},
+            {4, "Forty"},
+            {5, "Fifty"},
+            {6, "Sixty"},
+            {7, "Seventy"},
+            {8, "Eighty"},
+            {9, "Ninety"},
+    };
+
+    unordered_map<int, string> tenToNineteen = {
+            {10, "Ten"},
+            {11, "Eleven"},
+            {12, "Twelve"},
+            {13, "Thirteen"},
+            {14, "Fourteen"},
+            {15, "Fifteen"},
+            {16, "Sixteen"},
+            {17, "Seventeen"},
+            {18, "Eighteen"},
+            {19, "Nineteen"}
+    };
+
+    string threeNums(const int h, const int d, const int i) {
+        string res;
+        string hstr;
+        string dstr;
+        string istr;
+        if (h != 0) {
+            hstr = baseNames[h] + " " + "Hundred";
+        }
+        if (d != 0) {
+            if (d == 1) {
+                dstr = tenToNineteen[d * 10 + i];
+            } else
+                dstr = dozens[d];
+        }
+        if (i != 0) {
+            if (d != 1)
+                istr = baseNames[i];
+        }
+        res = hstr;
+        if (!dstr.empty()) {
+            if (!hstr.empty())
+                res += " " + dstr;
+            else
+                res = dstr;
+        }
+
+        if (!istr.empty()) {
+            if (!hstr.empty() || !dstr.empty())
+                res += " " + istr;
+            else
+                res += istr;
+        }
+        return res;
+    }
+
+public:
+    string numberToWords(int num) {
+        if (!num)
+            return "Zero";
+        int degree = 9;
+        while (pow(10, degree) > num)
+            --degree;
+        vector<int> parseRes;
+        int curNum = num;
+        while (degree >= 0) {
+            const int divisor = pow(10, degree);
+            const int div_res = curNum / divisor;
+            const int residue = curNum % divisor;
+            if (div_res != 0) {
+                parseRes.push_back(div_res);
+                curNum = residue;
+            } else
+                parseRes.push_back(0);
+            --degree;
+        }
+        vector <string> resBySplits;
+        for (int i = parseRes.size() - 1; i >= 0; i -= 3) {
+            int h = 0;
+            if (i - 2 >= 0)
+                h = parseRes[i - 2];
+            int d = 0;
+            if (i - 1 >= 0)
+                d = parseRes[i - 1];
+            resBySplits.emplace_back(threeNums(h, d, parseRes[i]));
+        }
+
+        unordered_map<int, string> suffexies = {
+                {0, ""},
+                {1, "Thousand"},
+                {2, "Million"},
+                {3, "Billion"}
+        };
+
+        for (int i = 0; i < resBySplits.size(); ++i) {
+            if (resBySplits[i].empty())
+                continue;
+            resBySplits[i] = resBySplits[i] + " " + suffexies[i];
+            if (i != resBySplits.size() - 1)
+                resBySplits[i] = " " + resBySplits[i];
+        }
+        string res;
+        for (auto rit = resBySplits.rbegin(); rit != resBySplits.rend(); ++rit)
+            res += *rit;
+        if (res.back() == ' ')
+            res.pop_back();
+        return res;
+    }
+};
