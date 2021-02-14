@@ -725,7 +725,7 @@ int _maxCoins(const vector<int> &nums, const int l, const int r, vector <vector<
     if (l + 1 == r) {
         return 0;
     }
-    if (cache[l][r] != -1)
+    if (cache[l][r] != -1) // cache[l][r] решение на открытом интервале (l, r)
         return cache[l][r];
     int res = 0;
     for (int i = l + 1; i < r; ++i) {
