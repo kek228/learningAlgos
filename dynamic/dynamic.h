@@ -1,5 +1,12 @@
 #pragma once
 
+vector <vector<int>> constructTable(int rows, int cols) {
+    vector <vector<int>> table(rows);
+    for (auto &row: table)
+        row = vector<int>(cols, 0);
+    return table;
+}
+
 // https://leetcode.com/problems/longest-increasing-subsequence/
 int lengthOfLIS(vector<int> &nums) {
     int size = nums.size();
@@ -31,9 +38,9 @@ int lengthOfLISBinSearch(vector<int> &nums) {
     subsequencies.push_back(nums[0]);
     for (int i = 1; i < nums.size(); ++i) {
         auto firstBigger = lower_bound(subsequencies.begin(), subsequencies.end(), nums[i]);
-        if (firstBigger == subsequencies.begin())
+        if (firstBigger == subsequencies.begin()) // если все эле-ты >=
             subsequencies[0] = nums[i];
-        else if (firstBigger == subsequencies.end())
+        else if (firstBigger == subsequencies.end()) // если все меньше
             subsequencies.push_back(nums[i]);
         else
             *firstBigger = nums[i];
@@ -285,7 +292,9 @@ int substringDiff(int k, string s1, string s2) {
 // минимальное кол-во вставок в строку чтобы стал палиндром
 // Найди минимальное разбиение строки, так чтобы все строки в разбиении были палиндромы
 // https://leetcode.com/problems/longest-palindromic-subsequence/
+
 int longestPalindromeSubseq(string s) {
+    // СОСТОЯНИЕ: строка: РАЗМЕР палинома. столбец: на какую буковку он кончается
     int size = s.size();
     if (size == 0)
         return 0;
@@ -858,8 +867,6 @@ bool _canPartitionKSubsets(vector<int> &nums, vector<int> &cache, int s, int k, 
     }
     cache[subset] = false;
     return false;
-
-
 }
 
 bool canPartitionKSubsets(vector<int> &nums, int k) {
