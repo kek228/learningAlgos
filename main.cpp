@@ -24,45 +24,37 @@ using namespace std;
 
 class Solution {
 public:
-    int minSwap(vector<int> &A, vector<int> &B) {
-        int s = 1; // i-1 элемент мы крутанули
-        int n = 0; // i-1 элемент мы НЕ крутанули
-        // 3 варианта :
-        // ВАРИАНТ 1
-        // 1 min(A[i], B[i]) > max(A[i-1], B[i-1]) -> можно
-        // куритить а можно и не крутить оба iх > i - 1 х
-        // общее для 2 и 3 что: min(A[i-1], B[i-1]) <= min(A[i], B[i]) < max(A[i-1], B[i-1])
-        // ВАРИАНТ 2
-        // A[i] <= A[i-1] || B[i] <= B[i-1]
-        // мы обязанны крутануть относительно нормального положения i-1 элемента
-        // а если i-1 уже покручен то не надо крутить
-        // ВАРИАНТ 3
-        // это нормальное положение при общем условии для 2 и 3
-        // Если бы i-1 был покручен то надо было бы покрутить, но в нормальном положении i-1 не надо
-        for (int i = 1; i < A.size(); ++i) {
-            if (min(A[i], B[i]) > max(A[i - 1], B[i - 1])) {
-                int _s = min(s, n) + 1;
-                n = min(s, n);
-                s = _s;
-            } else {
-                if (A[i] <= A[i - 1] || B[i] <= B[i - 1]) {
-                    int _s = n + 1;
-                    n = s;
-                    s = _s;
-                } else {
-                    s = s + 1;
-                    n = n;
-                }
-            }
+    void _fillMatrix(vector<vector<int>> &res, vector<int> &rowSum, vector<int> &colSum, int row, int col) {
+        if (row >= rowSum.size() || col >= colSum.size())
+            return;
+        if (rowSum[row] <= colSum[col]) {
+            colSum[col] -= rowSum[row];
+            res[row][col] = rowSum[row];
+            for (int _col = col + 1; _col < colSum.size(); ++_col)
+                res[row][_col] = 0;
+            _fillMatrix(res, rowSum, colSum, row + 1, col);
+        } else {
+            rowSum[row] -= colSum[col];
+            res[row][col] = colSum[col];
+            for (int _row = row + 1; _row < rowSum.size(); ++_row)
+                res[_row][col] = 0;
+            _fillMatrix(res, rowSum, colSum, row, col + 1);
         }
-        return min(s, n);
+    }
+
+    vector<vector<int>> restoreMatrix(vector<int> &rowSum, vector<int> &colSum) {
+        auto res = vector<vector<int>>(rowSum.size(), vector<int>());
+        for (auto &row: res)
+            row = vector<int>(colSum.size(), 0);
+        _fillMatrix(res, rowSum, colSum, 0, 0);
+        return res;
     }
 };
 
 int main() {
     Solution s;
-    vector<int> rowSum = {0, 3, 5, 8, 9};
-    vector<int> colSum = {2, 1, 4, 6, 9};
-    cout << s.minSwap(rowSum, colSum);
+    vector<int> rowSum = {4, 12, 10, 1, 0};
+    vector<int> colSum = {1, 0, 3, 16, 7};
+    s.restoreMatrix(rowSum, colSum);
     return 0;
 }

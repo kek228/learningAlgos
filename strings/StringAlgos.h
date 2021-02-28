@@ -409,3 +409,58 @@ public:
         return res;
     }
 };
+
+// сложение строк-целых чисел
+bool isInt(const char c) {
+    if (c >= '0' && c <= '9')
+        return true;
+    return false;
+}
+
+std::string _bigIntAdd(const std::string &first, const std::string &second) {
+    std::string res;
+    res.reserve(first.size() + 1);
+    //
+    int si = static_cast<int>(second.size()) - 1;
+    int fi = static_cast<int>(first.size()) - 1;
+    bool addOne = false;
+    for (; si >= 0; --si, --fi) {
+        if (!isInt(first[fi]))
+            throw std::runtime_error("invalid arg=" + first);
+        if (!isInt(second[si]))
+            throw std::runtime_error("invalid arg=" + second);
+        const int cur = first[fi] - '0' + second[si] - '0' + addOne;
+        if (cur < 10) {
+            res.push_back(cur + '0');
+            addOne = false;
+        } else {
+            res.push_back(cur - 10 + '0');
+            addOne = true;
+        }
+    }
+    //
+    if (fi >= 0) {
+        for (; fi >= 0; --fi) {
+            if (!isInt(first[fi]))
+                throw std::runtime_error("invalid arg=" + first);
+            const int cur = first[fi] - '0' + addOne;
+            if (cur < 10) {
+                res.push_back(cur + '0');
+                addOne = false;
+            } else {
+                res.push_back(cur - 10 + '0');
+                addOne = true;
+            }
+        }
+    }
+    if (addOne)
+        res.push_back('1');
+    std::reverse(res.begin(), res.end());
+    return res;
+}
+
+std::string bigIntAdd(const std::string &first, const std::string &second) {
+    if (first.size() > second.size())
+        return _bigIntAdd(first, second);
+    return _bigIntAdd(second, first);
+}
